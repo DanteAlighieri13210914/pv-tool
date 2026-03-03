@@ -129,9 +129,8 @@ const container = document.getElementById('pv-container')!;
 
 engine.init(container).then(() => {
   engine.setText('春を告げる/夜を越えて/踊れ踊れ');
-  const lastIdx = templates.length - 1;
-  engine.loadTemplate(templates[lastIdx]);
-  templateSelect.value = String(lastIdx);
+  engine.loadTemplate(templates[0]);
+  templateSelect.value = '0';
 });
 
 // Template
