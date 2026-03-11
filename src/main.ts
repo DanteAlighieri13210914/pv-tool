@@ -7,7 +7,12 @@ import { templates } from './templates';
 import { effectCatalog } from './core/effectCatalog';
 import type { TemplateConfig } from './core/types';
 import { t } from './i18n';
-
+import {
+  loadCustomTemplates,
+  saveCustomTemplates,
+  encodeShareCode,
+  decodeShareCode,
+} from './core/templateStore';
 
 console.log('%cPV Tool%c solaris:0914', 'color:#6688cc;font-weight:bold', 'color:#888');
 
@@ -24,11 +29,34 @@ app.innerHTML = `
   <div class="panels-wrapper" id="panels-wrapper">
     <div class="controls">
       <div class="control-group">
-        <label>${t('template')}</label>
+        <label class="label-with-action">${t('template')} <button class="btn btn-sm btn-label" id="tpl-import" title="${t('import_code')}">${t('import_code')}</button></label>
         <select id="template-select">
           ${templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('')}
           <option value="custom">${t('custom')}</option>
         </select>
+        <div class="template-actions">
+          <button class="btn btn-sm" id="tpl-save" title="${t('save_tpl')}" style="display:none">${t('save_tpl')}</button>
+          <button class="btn btn-sm" id="tpl-delete" title="${t('delete_tpl')}" style="display:none">${t('delete_tpl')}</button>
+          <button class="btn btn-sm" id="tpl-export" title="${t('export_code')}" style="display:none">${t('export_code')}</button>
+        </div>
+        <div id="tpl-save-input" class="tpl-inline-input" style="display:none">
+          <input type="text" id="tpl-name-input" placeholder="${t('tpl_name_placeholder')}">
+          <button class="btn btn-sm" id="tpl-save-ok">${t('confirm')}</button>
+          <button class="btn btn-sm" id="tpl-save-cancel">${t('cancel')}</button>
+        </div>
+        <div id="tpl-delete-confirm" class="tpl-inline-input" style="display:none">
+          <span class="tpl-confirm-text" id="tpl-delete-text"></span>
+          <button class="btn btn-sm btn-danger" id="tpl-delete-ok">${t('delete_tpl')}</button>
+          <button class="btn btn-sm" id="tpl-delete-cancel">${t('cancel')}</button>
+        </div>
+      </div>
+      <div class="control-group" id="share-code-group" style="display:none">
+        <label id="share-code-label">${t('share_code')}</label>
+        <textarea id="share-code-text" rows="3" placeholder="${t('paste_code')}"></textarea>
+        <div class="template-actions">
+          <button class="btn btn-sm" id="share-code-ok">${t('confirm')}</button>
+          <button class="btn btn-sm" id="share-code-cancel">${t('cancel')}</button>
+        </div>
       </div>
 
       <div class="control-group">
@@ -297,6 +325,12 @@ templateSelect.addEventListener('change', () => {
     isCustomMode = true;
     customPanel.style.display = '';
     engine.loadTemplate(buildCustomTemplate());
+  } else if (val.startsWith('user-')) {
+    isCustomMode = false;
+    customPanel.style.display = 'none';
+    const idx = parseInt(val.split('-')[1]);
+    engine.loadTemplate(customTemplates[idx]);
+    syncSpeedSlider();
   } else {
     isCustomMode = false;
     customPanel.style.display = 'none';
@@ -304,7 +338,173 @@ templateSelect.addEventListener('change', () => {
     syncSpeedSlider();
     syncOpacitySlider();
   }
+  updateTemplateButtons();
 });
+
+// ── Custom template management ──
+let customTemplates = loadCustomTemplates();
+
+function rebuildTemplateSelect() {
+  const builtInHtml = templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('');
+  const customHtml = customTemplates.map((tp, i) =>
+    `<option value="user-${i}">⭐ ${tp.name}</option>`
+  ).join('');
+  templateSelect.innerHTML = builtInHtml + customHtml + `<option value="custom">${t('custom')}</option>`;
+}
+
+function updateTemplateButtons() {
+  const val = templateSelect.value;
+  const isUser = val.startsWith('user-');
+  const isCustom = val === 'custom';
+  tplSaveBtn.style.display = isCustom ? '' : 'none';
+  tplDeleteBtn.style.display = isUser ? '' : 'none';
+  tplExportBtn.style.display = isUser ? '' : 'none';
+  // Hide inline inputs when switching
+  tplSaveInput.style.display = 'none';
+  tplDeleteConfirm.style.display = 'none';
+}
+
+const tplSaveBtn = document.getElementById('tpl-save')!;
+const tplDeleteBtn = document.getElementById('tpl-delete')!;
+const tplExportBtn = document.getElementById('tpl-export')!;
+const tplImportBtn = document.getElementById('tpl-import')!;
+const tplSaveInput = document.getElementById('tpl-save-input')!;
+const tplNameInput = document.getElementById('tpl-name-input') as HTMLInputElement;
+const tplSaveOk = document.getElementById('tpl-save-ok')!;
+const tplSaveCancel = document.getElementById('tpl-save-cancel')!;
+const tplDeleteConfirm = document.getElementById('tpl-delete-confirm')!;
+const tplDeleteText = document.getElementById('tpl-delete-text')!;
+const tplDeleteOk = document.getElementById('tpl-delete-ok')!;
+const tplDeleteCancel = document.getElementById('tpl-delete-cancel')!;
+const shareCodeGroup = document.getElementById('share-code-group')!;
+const shareCodeLabel = document.getElementById('share-code-label')!;
+const shareCodeText = document.getElementById('share-code-text') as HTMLTextAreaElement;
+const shareCodeOk = document.getElementById('share-code-ok')!;
+const shareCodeCancel = document.getElementById('share-code-cancel')!;
+
+let shareCodeMode: 'import' | 'export' = 'import';
+
+// Save: show inline name input
+tplSaveBtn.addEventListener('click', () => {
+  tplSaveInput.style.display = '';
+  tplNameInput.value = '';
+  tplNameInput.focus();
+});
+
+tplSaveCancel.addEventListener('click', () => {
+  tplSaveInput.style.display = 'none';
+});
+
+function doSave() {
+  const name = tplNameInput.value.trim();
+  if (!name) return;
+  const tpl = { ...buildCustomTemplate(), name };
+  customTemplates.push(tpl);
+  saveCustomTemplates(customTemplates);
+  rebuildTemplateSelect();
+  templateSelect.value = `user-${customTemplates.length - 1}`;
+  isCustomMode = false;
+  customPanel.style.display = 'none';
+  engine.loadTemplate(tpl);
+  updateTemplateButtons();
+  syncSpeedSlider();
+}
+
+tplSaveOk.addEventListener('click', doSave);
+tplNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doSave();
+  if (e.key === 'Escape') tplSaveInput.style.display = 'none';
+});
+
+// Delete: show inline confirmation
+tplDeleteBtn.addEventListener('click', () => {
+  const val = templateSelect.value;
+  if (!val.startsWith('user-')) return;
+  const idx = parseInt(val.split('-')[1]);
+  tplDeleteText.textContent = `${t('confirm_delete')} "${customTemplates[idx].name}"？`;
+  tplDeleteConfirm.style.display = '';
+});
+
+tplDeleteCancel.addEventListener('click', () => {
+  tplDeleteConfirm.style.display = 'none';
+});
+
+tplDeleteOk.addEventListener('click', () => {
+  const val = templateSelect.value;
+  if (!val.startsWith('user-')) return;
+  const idx = parseInt(val.split('-')[1]);
+  customTemplates.splice(idx, 1);
+  saveCustomTemplates(customTemplates);
+  rebuildTemplateSelect();
+  templateSelect.value = '0';
+  engine.loadTemplate(templates[0]);
+  updateTemplateButtons();
+  syncSpeedSlider();
+  tplDeleteConfirm.style.display = 'none';
+});
+
+// Export share code
+tplExportBtn.addEventListener('click', async () => {
+  const val = templateSelect.value;
+  if (!val.startsWith('user-')) return;
+  const idx = parseInt(val.split('-')[1]);
+  shareCodeMode = 'export';
+  shareCodeLabel.textContent = `${t('share_code')} (${t('code_copied')})`;
+  const code = await encodeShareCode(customTemplates[idx]);
+  shareCodeText.value = code;
+  shareCodeGroup.style.display = '';
+  shareCodeText.readOnly = true;
+  shareCodeOk.textContent = t('copy');
+  try { await navigator.clipboard.writeText(code); } catch { /* fallback: user copies manually */ }
+});
+
+// Import share code
+tplImportBtn.addEventListener('click', () => {
+  shareCodeMode = 'import';
+  shareCodeLabel.classList.remove('label-error');
+  shareCodeLabel.textContent = t('import_share');
+  shareCodeText.value = '';
+  shareCodeText.readOnly = false;
+  shareCodeOk.textContent = t('import_btn');
+  shareCodeGroup.style.display = '';
+});
+
+shareCodeOk.addEventListener('click', async () => {
+  if (shareCodeMode === 'export') {
+    try { await navigator.clipboard.writeText(shareCodeText.value); } catch { /* noop */ }
+    shareCodeGroup.style.display = 'none';
+    return;
+  }
+  // Import
+  const code = shareCodeText.value.trim();
+  if (!code) return;
+  try {
+    const tpl = await decodeShareCode(code);
+    customTemplates.push(tpl);
+    saveCustomTemplates(customTemplates);
+    rebuildTemplateSelect();
+    const newIdx = customTemplates.length - 1;
+    templateSelect.value = `user-${newIdx}`;
+    isCustomMode = false;
+    customPanel.style.display = 'none';
+    engine.loadTemplate(tpl);
+    updateTemplateButtons();
+    syncSpeedSlider();
+    shareCodeGroup.style.display = 'none';
+  } catch (err) {
+    shareCodeLabel.textContent = t('code_invalid');
+    shareCodeLabel.classList.add('label-error');
+    console.warn('[PV] Share code decode failed:', err);
+    return;
+  }
+});
+
+shareCodeCancel.addEventListener('click', () => {
+  shareCodeGroup.style.display = 'none';
+});
+
+// Rebuild select to include saved custom templates
+rebuildTemplateSelect();
 
 let customRebuildTimer: ReturnType<typeof setTimeout>;
 effectGrid.addEventListener('change', () => {

@@ -78,17 +78,28 @@ export const zh = {
   'tpl_spiderWeb': '蛛网',
   'tpl_staggeredText': '错落文字',
   'tpl_calmVillain': '冷静的反派',
+  'tpl_girlyClouds': '少女云朵',
 
   // File picker
   'choose_file': '选择文件',
   'no_file': '未选择文件',
 
-  // Sharecode
+  // Sharecode & template management
   'export_code': '导出配置码',
   'import_code': '导入配置码',
   'import_btn': '导入',
   'code_copied': '已复制',
   'code_invalid': '配置码无效',
+  'save_tpl': '保存',
+  'delete_tpl': '删除',
+  'confirm': '确认',
+  'cancel': '取消',
+  'tpl_name_placeholder': '输入模板名称...',
+  'confirm_delete': '确认删除',
+  'share_code': '分享码 Share Code',
+  'copy': '复制',
+  'paste_code': '粘贴分享码...',
+  'import_share': '导入分享码',
 
   // Effect categories (used in custom panel)
   'ecat_背景': '背景',

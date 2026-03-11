@@ -322,6 +322,84 @@ input[type='range'] {
   min-width: 40px;
 }
 
+/* Template actions */
+.template-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.btn-sm {
+  margin-top: 0;
+  padding: 3px 8px;
+  font-size: 0.7rem;
+}
+
+.btn-danger {
+  border-color: rgba(255, 80, 80, 0.5);
+  background: rgba(255, 50, 50, 0.25);
+}
+
+.btn-danger:hover {
+  background: rgba(255, 50, 50, 0.4);
+}
+
+.label-with-action {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.btn-label {
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.tpl-inline-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.tpl-inline-input input[type="text"] {
+  flex: 1;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+.label-error {
+  color: rgba(255, 120, 120, 0.9) !important;
+}
+
+.tpl-confirm-text {
+  font-size: 0.72rem;
+  color: rgba(255, 180, 180, 0.9);
+  flex: 1;
+}
+
+#share-code-text {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  resize: vertical;
+  outline: none;
+}
+
+#share-code-text:focus {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 /* Canvas color swatches */
 .color-swatches {
   display: flex;

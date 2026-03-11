@@ -80,17 +80,28 @@ export const ja: Record<LocaleKey, string> = {
   'tpl_spiderWeb': 'スパイダーウェブ',
   'tpl_staggeredText': 'スタッガードテキスト',
   'tpl_calmVillain': 'クールヴィラン',
+  'tpl_girlyClouds': 'ガーリークラウド',
 
   // File picker
   'choose_file': 'ファイル選択',
   'no_file': '未選択',
 
-  // Sharecode
+  // Sharecode & template management
   'export_code': '設定コード出力',
   'import_code': '設定コード入力',
   'import_btn': '読込',
   'code_copied': 'コピー済',
   'code_invalid': 'コード無効',
+  'save_tpl': '保存',
+  'delete_tpl': '削除',
+  'confirm': '確認',
+  'cancel': 'キャンセル',
+  'tpl_name_placeholder': 'テンプレート名を入力...',
+  'confirm_delete': '削除確認',
+  'share_code': 'シェアコード Share Code',
+  'copy': 'コピー',
+  'paste_code': 'シェアコードを貼り付け...',
+  'import_share': 'シェアコード読込',
 
   // Effect categories
   'ecat_背景': '背景',
