@@ -704,9 +704,7 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
   (document.getElementById('mobile-toggle') as HTMLElement).style.display = 'none';
 
   // 等 engine 初始化完成后开启透明模式
-  engine.init(container).then(() => {
-    engine.alphaMode = true;
-  });
+  engine.alphaMode = true;
 
   // ── Now Playing 歌词同步 ──
   const NP_BASE       = 'http://localhost:9863';
