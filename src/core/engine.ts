@@ -213,18 +213,18 @@ export class PVEngine {
   get effectOpacity() { return this._effectOpacity; }
 
   set alphaMode(val: boolean) {
-    this._alphaMode = val;
-    const bgLayer = this.layers.get('background');
-    if (val) {
-      this.bgFill.visible = false;
-      if (bgLayer) bgLayer.visible = false;
-      this.app.renderer.background.alpha = 0;  
-    } else {
-      this.bgFill.visible = true;
-      if (bgLayer) bgLayer.visible = true;
-      this.app.renderer.background.alpha = 1;  
-    }
+  this._alphaMode = val;
+  const bgLayer = this.layers.get('background');
+  if (val) {
+    if (this.bgFill) this.bgFill.visible = false;
+    if (bgLayer) bgLayer.visible = false;
+    if (this.app.renderer) this.app.renderer.background.alpha = 0;
+  } else {
+    if (this.bgFill) this.bgFill.visible = true;
+    if (bgLayer) bgLayer.visible = true;
+    if (this.app.renderer) this.app.renderer.background.alpha = 1;
   }
+}
   get alphaMode() { return this._alphaMode; }
 
   private updateBgFill() {
