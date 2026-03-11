@@ -230,11 +230,10 @@ engine.init(container).then(() => {
 
   // URL参数指定模板
   const tParam = new URLSearchParams(window.location.search).get('t');
-  const tIdx = tParam !== null ? parseInt(tParam) : NaN;
-  const templateIdx = !isNaN(tIdx) ? tIdx : 0;
+  const tIdx = tParam !== null && !isNaN(parseInt(tParam)) ? parseInt(tParam) : 0;
+  engine.loadTemplate(templates[tIdx]);
+  templateSelect.value = String(tIdx);
   
-  engine.loadTemplate(templates[0]);  //
-  templateSelect.value = '0';
   syncSpeedSlider();
   syncOpacitySlider();
 });
