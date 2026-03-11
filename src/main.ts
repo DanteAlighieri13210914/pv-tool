@@ -226,10 +226,11 @@ engine.init(container).then(() => {
 
   // OBS 透明模式
   if (new URLSearchParams(window.location.search).get('obs') === '1') {
-  document.body.style.background = 'transparent';
-  document.documentElement.style.background = 'transparent';
-  engine.alphaMode = true;  
-}
+    document.body.style.background = 'transparent';
+    document.documentElement.style.background = 'transparent';
+    engine.alphaMode = true;
+  }
+});  
 
 // Mobile toggle
 const mobileToggle = document.getElementById('mobile-toggle')!;
