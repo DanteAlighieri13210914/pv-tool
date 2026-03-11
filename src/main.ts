@@ -223,6 +223,7 @@ engine.init(container).then(() => {
   templateSelect.value = '0';
   syncSpeedSlider();
   syncOpacitySlider();
+});
 
   // OBS 透明模式
   if (new URLSearchParams(window.location.search).get('obs') === '1') {
