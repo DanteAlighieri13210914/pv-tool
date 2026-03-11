@@ -708,12 +708,20 @@ recBtn.addEventListener('click', () => {
 // ══════════════════════════════════════════════════════════
 
 if (new URLSearchParams(window.location.search).get('obs') === '1') {
-
-  // 隐藏所有 UI 面板
+  // 隐藏面板
   (document.getElementById('panels-wrapper') as HTMLElement).style.display = 'none';
   (document.getElementById('mobile-toggle') as HTMLElement).style.display = 'none';
 
-  // 等 engine 初始化完成后开启透明模式
+  // 按 H 键切换面板显示
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'h' || e.key === 'H') {
+      const panels = document.getElementById('panels-wrapper')!;
+      const toggle = document.getElementById('mobile-toggle')!;
+      const hidden = panels.style.display === 'none';
+      panels.style.display = hidden ? '' : 'none';
+      toggle.style.display = hidden ? '' : 'none';
+    }
+  });
 
 
   // ── Now Playing 歌词同步 ──
