@@ -228,6 +228,7 @@ engine.init(container).then(() => {
   if (new URLSearchParams(window.location.search).get('obs') === '1') {
   document.body.style.background = 'transparent';
   document.documentElement.style.background = 'transparent';
+  engine.alphaMode = true;  
 }
 
 // Mobile toggle
