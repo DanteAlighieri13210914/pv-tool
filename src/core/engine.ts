@@ -218,9 +218,11 @@ export class PVEngine {
     if (val) {
       this.bgFill.visible = false;
       if (bgLayer) bgLayer.visible = false;
+      this.app.renderer.background.alpha = 0;  
     } else {
       this.bgFill.visible = true;
       if (bgLayer) bgLayer.visible = true;
+      this.app.renderer.background.alpha = 1;  
     }
   }
   get alphaMode() { return this._alphaMode; }
