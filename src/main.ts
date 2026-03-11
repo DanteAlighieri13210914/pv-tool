@@ -217,6 +217,10 @@ app.innerHTML = `
 const engine = new PVEngine();
 const container = document.getElementById('pv-container')!;
 
+// ← 在 init 之前设好
+if (new URLSearchParams(window.location.search).get('obs') === '1') {
+  engine.alphaMode = true;
+}
 engine.init(container).then(() => {
   engine.setText('...');
   engine.loadTemplate(templates[0]);
