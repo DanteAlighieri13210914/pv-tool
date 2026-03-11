@@ -218,18 +218,17 @@ const engine = new PVEngine();
 const container = document.getElementById('pv-container')!;
 
 engine.init(container).then(() => {
-  engine.setText('深夜東京/の6畳半夢/を見てた/灯りの灯らない蛍光灯/明日には消えてる電脳城/に/開幕戦/打ち上げて/いなくなんないよね/ここには誰もいない/ここには誰もいないから');
+  engine.setText('...');
   engine.loadTemplate(templates[0]);
   templateSelect.value = '0';
   syncSpeedSlider();
   syncOpacitySlider();
-});
 
   // OBS 透明模式
   if (new URLSearchParams(window.location.search).get('obs') === '1') {
     engine.alphaMode = true;
   }
-});
+});   
 
 // Mobile toggle
 const mobileToggle = document.getElementById('mobile-toggle')!;
