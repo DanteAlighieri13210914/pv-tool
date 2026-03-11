@@ -152,8 +152,10 @@ export class PVEngine {
       if (this._bgColorOverride) {
         this.palette.background = this._bgColorOverride;
       }
-      this.app.renderer.background.color = new PIXI.Color(this.palette.background).toNumber();
-      this.updateBgFill();
+      if (!this._alphaMode) {
+  this.app.renderer.background.color = new PIXI.Color(this.palette.background).toNumber();
+  this.updateBgFill();  
+}
 
       for (const entry of template.effects) {
         const layer = this.layers.get(entry.layer);
