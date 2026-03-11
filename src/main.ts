@@ -219,7 +219,7 @@ const container = document.getElementById('pv-container')!;
 
 
 engine.init(container).then(() => {
-  engine.setText('...');
+  engine.setText('深夜東京/の6畳半夢/を見てた/灯りの灯らない蛍光灯/明日には消えてる電脳城/に/開幕戦/打ち上げて/いなくなんないよね/ここには誰もいない/ここには誰もいないから');
 
   // OBS 透明模式 
   if (new URLSearchParams(window.location.search).get('obs') === '1') {
