@@ -313,6 +313,7 @@ templateSelect.addEventListener('change', () => {
     engine.loadTemplate(templates[parseInt(val)]);
     syncSpeedSlider();
     syncOpacitySlider();
+    localStorage.setItem('pv-template', val);
   }
 });
 
@@ -723,7 +724,21 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
     }
   });
 
+// 读取普通版模板设置
+const savedTemplate = localStorage.getItem('pv-template');
+if (savedTemplate && savedTemplate !== 'custom') {
+  const idx = parseInt(savedTemplate);
+  if (!isNaN(idx)) engine.loadTemplate(templates[idx]);
+}
 
+// 监听普通版切换模板
+window.addEventListener('storage', (e) => {
+  if (e.key === 'pv-template' && e.newValue && e.newValue !== 'custom') {
+    const idx = parseInt(e.newValue);
+    if (!isNaN(idx)) engine.loadTemplate(templates[idx]);
+  }
+});
+  
   // ── Now Playing 歌词同步 ──
   const NP_BASE       = 'http://localhost:9863';
   const LYRIC_REFRESH = 5000;
