@@ -738,6 +738,13 @@ window.addEventListener('storage', (e) => {
     if (!isNaN(idx)) engine.loadTemplate(templates[idx]);
   }
 });
+
+  // URL参数指定模板 (?t=0)
+const tParam = new URLSearchParams(window.location.search).get('t');
+if (tParam !== null) {
+  const idx = parseInt(tParam);
+  if (!isNaN(idx)) engine.loadTemplate(templates[idx]);
+}
   
   // ── Now Playing 歌词同步 ──
   const NP_BASE       = 'http://localhost:9863';
