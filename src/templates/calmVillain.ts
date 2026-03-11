@@ -11,6 +11,7 @@ import type { TemplateConfig } from '../core/types';
  */
 export const calmVillainTemplate: TemplateConfig = {
   name: '冷静的反派',
+  nameKey: 'tpl_calmVillain',
   palette: {
     background: '#f5c6d0',
     primary: '#2255cc',

@@ -31,6 +31,7 @@ import type { TemplateConfig } from '../core/types';
  */
 export const cyberpunkHudTemplate: TemplateConfig = {
   name: '夜之城监控(建议配合视频使用)',
+  nameKey: 'tpl_cyberpunkHud',
   palette: {
     background: '#0a0a0a',
     primary: '#FFFF00',

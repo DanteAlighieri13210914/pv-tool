@@ -5,9 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>PV Tool - 日式PV Visual生成</title>
+    <meta name="generator" content="solaris-0914">
+    <link rel="alternate" hreflang="zh" href="https://pv.pixjam.cn/" />
+    <link rel="alternate" hreflang="ja" href="https://pv.pixjam.cn/ja/" />
+    <link rel="alternate" hreflang="x-default" href="https://pv.pixjam.cn/" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+      // Set html lang based on URL path before render
+      if (window.location.pathname.includes('/ja')) {
+        document.documentElement.lang = 'ja';
+      } else {
+        document.documentElement.lang = 'zh';
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>

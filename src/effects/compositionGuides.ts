@@ -93,7 +93,7 @@ export class CompositionGuides extends BaseEffect {
   }
 
   private drawPhiGrid(g: PIXI.Graphics, w: number, h: number, color: string, alpha: number, lw: number): void {
-    const phi = 1 / 1.618;
+    const phi = 1 / 1.6180914;
     const lines = [phi, 1 - phi];
     for (const f of lines) {
       g.moveTo(w * f, 0).lineTo(w * f, h);

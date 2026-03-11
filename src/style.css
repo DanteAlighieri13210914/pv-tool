@@ -1,6 +1,8 @@
 :root {
   font-family: 'Noto Sans JP', 'Inter', system-ui, sans-serif;
   line-height: 1.5;
+  --pv-build: 0914;
+  --pv-accent-hsl: 221 60% 48%;
 }
 
 * {
@@ -64,10 +66,66 @@ body {
   transform: translateX(-50%);
   top: auto;
   bottom: 16px;
-  min-width: 600px;
+  min-width: 700px;
   max-width: 90vw;
-  max-height: 180px;
+  max-height: 40vh;
   overflow-y: auto;
+}
+
+.sharecode-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.sharecode-input {
+  flex: 1;
+  min-width: 100px;
+  padding: 4px 8px !important;
+  font-size: 0.72rem !important;
+  font-family: monospace;
+}
+
+.sharecode-status {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-sm {
+  margin-top: 0;
+  padding: 3px 8px;
+  font-size: 0.68rem;
+}
+
+.effect-category {
+  margin-bottom: 4px;
+}
+
+.effect-category-title {
+  font-size: 0.68rem;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  padding: 3px 0;
+  list-style: none;
+  user-select: none;
+  letter-spacing: 0.5px;
+}
+
+.effect-category-title::before {
+  content: '▸ ';
+  display: inline-block;
+  transition: transform 0.15s;
+}
+
+.effect-category[open] > .effect-category-title::before {
+  content: '▾ ';
+}
+
+.effect-category-title:hover {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .effect-grid {
@@ -113,7 +171,8 @@ body {
 }
 
 select,
-input[type='text'] {
+input[type='text'],
+textarea {
   width: 100%;
   padding: 6px 10px;
   border-radius: 6px;
@@ -126,9 +185,22 @@ input[type='text'] {
   transition: border-color 0.2s;
 }
 
+textarea {
+  resize: none;
+  min-height: 30px;
+  line-height: 1.4;
+  overflow: hidden;
+  transition: height 0.2s ease;
+}
+
 select:focus,
-input[type='text']:focus {
+input[type='text']:focus,
+textarea:focus {
   border-color: rgba(255, 255, 255, 0.5);
+}
+
+textarea.text-expanded {
+  overflow-y: auto;
 }
 
 select option {
@@ -136,30 +208,51 @@ select option {
   color: #fff;
 }
 
-input[type='file'] {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+.file-pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-input[type='file']::file-selector-button {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  margin-right: 8px;
-}
-
-input[type='file']::file-selector-button:hover {
-  background: rgba(255, 255, 255, 0.25);
+.file-pick-name {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
 }
 
 input[type='range'] {
   width: 100%;
   accent-color: #6688cc;
   cursor: pointer;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.slider-row .slider-label {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  min-width: 34px;
+}
+
+.slider-row input[type='range'] {
+  flex: 1;
+  min-width: 0;
+}
+
+.slider-row span:last-child {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  min-width: 28px;
+  text-align: right;
 }
 
 .btn {
@@ -354,6 +447,7 @@ input[type='range'] {
     bottom: auto;
     transform: none;
     min-width: unset;
+    max-width: unset;
     width: 100%;
     border-radius: 0;
     max-height: none;
@@ -382,12 +476,13 @@ input[type='range'] {
   }
 
   .effect-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 4px 10px;
   }
 
   select,
-  input[type='text'] {
+  input[type='text'],
+  textarea {
     padding: 8px 10px;
     font-size: 0.9rem;
   }

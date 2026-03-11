@@ -5,6 +5,7 @@ import type { TemplateConfig } from '../core/types';
 
 export const kineticSplitTemplate: TemplateConfig = {
   name: '斩击',
+  nameKey: 'tpl_kineticSplit',
   palette: {
     background: '#f0ece8',
     primary: '#1a1a1a',

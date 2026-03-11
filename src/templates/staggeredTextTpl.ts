@@ -5,6 +5,7 @@ import type { TemplateConfig } from '../core/types';
 
 export const staggeredTextTplTemplate: TemplateConfig = {
   name: '错落文字',
+  nameKey: 'tpl_staggeredText',
   animationSpeed: 3.4,
   palette: {
     background: '#1a2a6c',

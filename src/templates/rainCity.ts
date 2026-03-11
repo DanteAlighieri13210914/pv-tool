@@ -5,6 +5,7 @@ import type { TemplateConfig } from '../core/types';
 
 export const rainCityTemplate: TemplateConfig = {
   name: '黑客帝国',
+  nameKey: 'tpl_rainCity',
   palette: {
     background: '#000000',
     primary: '#003b00',

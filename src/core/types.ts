@@ -19,10 +19,12 @@ export interface EffectEntry {
 
 export interface TemplateConfig {
   name: string;
+  nameKey?: string;
   palette: ColorPalette;
   effects: EffectEntry[];
   bpm?: number;
   animationSpeed?: number;
+  bgOpacity?: number;
   features?: {
     mediaOutline?: boolean;
     autoExtractColors?: boolean;

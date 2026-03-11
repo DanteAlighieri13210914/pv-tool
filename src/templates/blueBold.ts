@@ -5,6 +5,7 @@ import type { TemplateConfig } from '../core/types';
 
 export const blueBoldTemplate: TemplateConfig = {
   name: '蓝色冲击',
+  nameKey: 'tpl_blueBold',
   palette: {
     background: '#1122ee',
     primary: '#ffffff',

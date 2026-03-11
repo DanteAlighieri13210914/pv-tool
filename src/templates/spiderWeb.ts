@@ -5,6 +5,7 @@ import type { TemplateConfig } from '../core/types';
 
 export const spiderWebTemplate: TemplateConfig = {
   name: '蛛网',
+  nameKey: 'tpl_spiderWeb',
   palette: {
     background: '#000000',
     primary: '#ff2222',

@@ -16,6 +16,7 @@ import type { TemplateConfig } from '../core/types';
  */
 export const bluePlaneTemplate: TemplateConfig = {
   name: '蓝色构成(建议配合视频使用)',
+  nameKey: 'tpl_bluePlane',
   palette: {
     background: '#f0ece6',
     primary: '#0028B4',

@@ -10,6 +10,7 @@ import type { TemplateConfig } from '../core/types';
  */
 export const emotionCinemaTemplate: TemplateConfig = {
   name: '情绪电影(建议配合视频使用)',
+  nameKey: 'tpl_emotionCinema',
   palette: {
     background: '#0d1018',
     primary: '#c8c8d0',

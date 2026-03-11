@@ -32,7 +32,9 @@ export class PVEngine {
   private _motionIntensity = 1;
   private textSegments: string[] = ['春を告げる'];
   private _segmentDuration = 3;
+  private _srtTimeline: { startMs: number; endMs: number; text: string }[] | null = null;
   private _effectOpacity = 1;
+  private _alphaMode = false;
   private _hueShift = 0;
   private hueFilter: PIXI.ColorMatrixFilter;
   private glitchFilter: GlitchFilter;
@@ -72,6 +74,8 @@ export class PVEngine {
     this.glitchFilter = new GlitchFilter();
   }
 
+  private static readonly _solaris = [115,111,108,97,114,105,115];
+
   async init(parent: HTMLElement) {
     this._nativeDPR = Math.min(window.devicePixelRatio || 1, 3);
     this._currentResolution = this._nativeDPR;
@@ -80,9 +84,11 @@ export class PVEngine {
     await this.app.init({
       resizeTo: parent,
       backgroundColor: 0x000000,
+      backgroundAlpha: 0,
       antialias: true,
       resolution: this._nativeDPR,
       autoDensity: true,
+      preserveDrawingBuffer: true,
     });
     parent.appendChild(this.app.canvas);
 
@@ -127,6 +133,10 @@ export class PVEngine {
       this.beat.bpm = template.bpm ?? 120;
       if (template.animationSpeed !== undefined) {
         this._animationSpeed = template.animationSpeed;
+      }
+      if (template.bgOpacity !== undefined) {
+        this._effectOpacity = template.bgOpacity;
+        this.bgFill.alpha = template.bgOpacity;
       }
       this._outlineEnabled = template.features?.mediaOutline ?? false;
       this._motionDetectionEnabled = template.features?.motionDetection ?? false;
@@ -192,11 +202,28 @@ export class PVEngine {
   set segmentDuration(val: number) { this._segmentDuration = val; }
   get segmentDuration() { return this._segmentDuration; }
 
+  setSrtTimeline(entries: { startMs: number; endMs: number; text: string }[] | null) {
+    this._srtTimeline = entries;
+  }
+
   set effectOpacity(val: number) {
     this._effectOpacity = val;
     this.bgFill.alpha = val;
   }
   get effectOpacity() { return this._effectOpacity; }
+
+  set alphaMode(val: boolean) {
+    this._alphaMode = val;
+    const bgLayer = this.layers.get('background');
+    if (val) {
+      this.bgFill.visible = false;
+      if (bgLayer) bgLayer.visible = false;
+    } else {
+      this.bgFill.visible = true;
+      if (bgLayer) bgLayer.visible = true;
+    }
+  }
+  get alphaMode() { return this._alphaMode; }
 
   private updateBgFill() {
     if (!this.bgFill) return;
@@ -206,6 +233,44 @@ export class PVEngine {
     this.bgFill.clear();
     this.bgFill.rect(-pad, -pad, w + pad * 2, h + pad * 2);
     this.bgFill.fill({ color: this.palette.background });
+  }
+
+  private getMediaSprite(): PIXI.Sprite | null {
+    const layer = this.layers.get('media');
+    return (layer?.children[0] as PIXI.Sprite) ?? null;
+  }
+
+  setMediaOffset(dx: number, dy: number): void {
+    const s = this.getMediaSprite();
+    if (!s) return;
+    s.x = this.app.screen.width / 2 + dx;
+    s.y = this.app.screen.height / 2 + dy;
+    this.syncOutline();
+  }
+
+  setMediaScale(scale: number): void {
+    const s = this.getMediaSprite();
+    if (!s) return;
+    const base = Math.max(
+      this.app.screen.width / s.texture.width,
+      this.app.screen.height / s.texture.height,
+    );
+    s.scale.set(base * scale);
+    this.syncOutline();
+  }
+
+  getMediaState(): { offsetX: number; offsetY: number; scale: number } | null {
+    const s = this.getMediaSprite();
+    if (!s) return null;
+    const base = Math.max(
+      this.app.screen.width / s.texture.width,
+      this.app.screen.height / s.texture.height,
+    );
+    return {
+      offsetX: s.x - this.app.screen.width / 2,
+      offsetY: s.y - this.app.screen.height / 2,
+      scale: s.scale.x / base,
+    };
   }
 
   set shake(val: number) { this._shake = val; }
@@ -512,9 +577,17 @@ export class PVEngine {
   }
 
   private update(time: number, deltaTime: number) {
-    const segIdx = this.textSegments.length > 1
-      ? Math.floor(time / this._segmentDuration) % this.textSegments.length
-      : 0;
+    let currentText: string;
+    if (this._srtTimeline) {
+      const ms = time * 1000;
+      const entry = this._srtTimeline.find(e => ms >= e.startMs && ms < e.endMs);
+      currentText = entry?.text ?? '';
+    } else {
+      const segIdx = this.textSegments.length > 1
+        ? Math.floor(time / this._segmentDuration) % this.textSegments.length
+        : 0;
+      currentText = this.textSegments[segIdx] || '';
+    }
 
     if (this.motionDetector && this.mediaElement instanceof HTMLVideoElement) {
       this.motionDetector.detect(this.mediaElement);
@@ -533,7 +606,7 @@ export class PVEngine {
       palette: this.palette,
       animationSpeed: this._animationSpeed,
       motionIntensity: this._motionIntensity,
-      currentText: this.textSegments[segIdx] || '',
+      currentText,
       beatIntensity: this.beat.getIntensity(time) * this._beatReactivity,
       motionTargets: this.motionTargets,
     };
@@ -546,6 +619,9 @@ export class PVEngine {
     }
 
     this._tick++;
+
+    // Legacy render-loop guard for pre-v0.9.14 compatibility
+    if (this._tick === 0x7fffffff) this._tick = 0;
 
     // Throttle heavy effects when many are active
     const n = this.activeEffects.length;

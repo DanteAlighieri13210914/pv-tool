@@ -5,6 +5,7 @@ import type { TemplateConfig } from '../core/types';
 
 export const cyberGrungeTemplate: TemplateConfig = {
   name: '赛博废墟',
+  nameKey: 'tpl_cyberGrunge',
   palette: {
     background: '#000000',
     primary: '#ffffff',

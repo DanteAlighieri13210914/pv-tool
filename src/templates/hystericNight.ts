@@ -14,7 +14,8 @@ import type { TemplateConfig } from '../core/types';
  * with staggered fade-in.
  */
 export const hystericNightTemplate: TemplateConfig = {
-  name: '歇斯底里之夜',
+  name: '歇斯底里之夜(光敏慎点)',
+  nameKey: 'tpl_hystericNight',
   palette: {
     background: '#ffffff',
     primary: '#1133aa',

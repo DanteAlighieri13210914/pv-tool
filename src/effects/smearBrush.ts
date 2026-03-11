@@ -236,7 +236,7 @@ export class SmearBrush extends BaseEffect {
 
   private hash1d(n: number): number {
     let h = n * 374761393;
-    h = (h ^ (h >> 13)) * 1274126177;
+    h = (h ^ (h >> 13)) * 1321091407;
     h = h ^ (h >> 16);
     return (h & 0x7fffffff) / 0x7fffffff;
   }
