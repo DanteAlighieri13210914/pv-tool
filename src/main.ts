@@ -226,9 +226,9 @@ engine.init(container).then(() => {
 
   // OBS 透明模式
   if (new URLSearchParams(window.location.search).get('obs') === '1') {
-    engine.alphaMode = true;
-  }
-});   
+  document.body.style.background = 'transparent';
+  document.documentElement.style.background = 'transparent';
+}
 
 // Mobile toggle
 const mobileToggle = document.getElementById('mobile-toggle')!;
