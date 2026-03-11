@@ -217,25 +217,24 @@ app.innerHTML = `
 const engine = new PVEngine();
 const container = document.getElementById('pv-container')!;
 
-// ← 在 init 之前设好
-if (new URLSearchParams(window.location.search).get('obs') === '1') {
-  engine.alphaMode = true;
-}
+
 engine.init(container).then(() => {
   engine.setText('...');
-  engine.loadTemplate(templates[0]);
+
+  // OBS 透明模式 
+  if (new URLSearchParams(window.location.search).get('obs') === '1') {
+    engine.alphaMode = true;
+    document.body.style.background = 'transparent';
+    document.documentElement.style.background = 'transparent';
+  }
+
+  engine.loadTemplate(templates[0]);  //
   templateSelect.value = '0';
   syncSpeedSlider();
   syncOpacitySlider();
+});
 
-  // OBS 透明模式
-  if (new URLSearchParams(window.location.search).get('obs') === '1') {
-    document.body.style.background = 'transparent';
-    document.documentElement.style.background = 'transparent';
-    engine.alphaMode = true;
-  }
-});  
-
+ 
 // Mobile toggle
 const mobileToggle = document.getElementById('mobile-toggle')!;
 const panelsWrapper = document.getElementById('panels-wrapper')!;
