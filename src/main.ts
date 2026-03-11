@@ -228,6 +228,11 @@ engine.init(container).then(() => {
     document.documentElement.style.background = 'transparent';
   }
 
+  // URL参数指定模板
+  const tParam = new URLSearchParams(window.location.search).get('t');
+  const tIdx = tParam !== null ? parseInt(tParam) : NaN;
+  const templateIdx = !isNaN(tIdx) ? tIdx : 0;
+  
   engine.loadTemplate(templates[0]);  //
   templateSelect.value = '0';
   syncSpeedSlider();
@@ -724,27 +729,6 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
     }
   });
 
-// 读取普通版模板设置
-const savedTemplate = localStorage.getItem('pv-template');
-if (savedTemplate && savedTemplate !== 'custom') {
-  const idx = parseInt(savedTemplate);
-  if (!isNaN(idx)) engine.loadTemplate(templates[idx]);
-}
-
-// 监听普通版切换模板
-window.addEventListener('storage', (e) => {
-  if (e.key === 'pv-template' && e.newValue && e.newValue !== 'custom') {
-    const idx = parseInt(e.newValue);
-    if (!isNaN(idx)) engine.loadTemplate(templates[idx]);
-  }
-});
-
-  // URL参数指定模板 (?t=0)
-const tParam = new URLSearchParams(window.location.search).get('t');
-if (tParam !== null) {
-  const idx = parseInt(tParam);
-  if (!isNaN(idx)) engine.loadTemplate(templates[idx]);
-}
   
   // ── Now Playing 歌词同步 ──
   const NP_BASE       = 'http://localhost:9863';
