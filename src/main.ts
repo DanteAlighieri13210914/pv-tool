@@ -230,9 +230,15 @@ engine.init(container).then(() => {
 
   // URL参数指定模板
   const tParam = new URLSearchParams(window.location.search).get('t');
+if (tParam === 'custom') {
+  templateSelect.value = 'custom';
+  customPanel.style.display = '';
+  isCustomMode = true;
+} else {
   const tIdx = tParam !== null && !isNaN(parseInt(tParam)) ? parseInt(tParam) : 0;
   engine.loadTemplate(templates[tIdx]);
   templateSelect.value = String(tIdx);
+}
   
   syncSpeedSlider();
   syncOpacitySlider();
