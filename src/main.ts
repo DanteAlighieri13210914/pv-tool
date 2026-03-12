@@ -24,12 +24,22 @@ app.innerHTML = `
   <div class="panels-wrapper" id="panels-wrapper">
     <div class="controls">
       <div class="control-group">
-        <label>${t('template')}</label>
-        <select id="template-select">
-          ${templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('')}
-          <option value="custom">${t('custom')}</option>
-        </select>
-      </div>
+  <label>${t('template')}</label>
+  <div id="template-buttons" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">
+    ${templates.map((tp, i) => `
+      <button class="tpl-btn" data-idx="${i}" style="padding:4px 8px;font-size:11px;cursor:pointer;background:#333;color:#fff;border:1px solid #555;border-radius:3px;">
+        ${tplName(tp)}
+      </button>
+    `).join('')}
+    <button class="tpl-btn" data-idx="custom" style="padding:4px 8px;font-size:11px;cursor:pointer;background:#333;color:#fff;border:1px solid #555;border-radius:3px;">
+      ${t('custom')}
+    </button>
+  </div>
+  <select id="template-select" style="display:none">
+    ${templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('')}
+    <option value="custom">${t('custom')}</option>
+  </select>
+</div>
 
       <div class="control-group">
         <label>${t('canvas_color')}</label>
