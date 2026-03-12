@@ -370,6 +370,27 @@ effectGrid.addEventListener('change', () => {
   }
 });
 
+function saveSlot(n: number) {
+  const checks = effectGrid.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+  const state: boolean[] = [];
+  checks.forEach(cb => state.push(cb.checked));
+  localStorage.setItem(`pv-slot-${n}`, JSON.stringify(state));
+}
+
+function loadSlot(n: number) {
+  const saved = localStorage.getItem(`pv-slot-${n}`);
+  if (!saved) return;
+  const state: boolean[] = JSON.parse(saved);
+  const checks = effectGrid.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+  checks.forEach((cb, i) => { if (state[i] !== undefined) cb.checked = state[i]; });
+  if (isCustomMode) engine.loadTemplate(buildCustomTemplate());
+}
+
+[1,2,3].forEach(n => {
+  document.getElementById(`save-slot-${n}`)!.addEventListener('click', () => saveSlot(n));
+  document.getElementById(`load-slot-${n}`)!.addEventListener('click', () => loadSlot(n));
+});
+
 // Text input with auto-expand on focus
 const textInput = document.getElementById('text-input') as HTMLTextAreaElement;
 
