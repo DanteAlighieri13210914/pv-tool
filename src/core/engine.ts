@@ -195,6 +195,17 @@ export class PVEngine {
     }
   }
 
+  setTextLive(text: string) {
+  this.userText = text;
+  this.textSegments = text
+    .split('/')
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+  if (this.textSegments.length === 0) {
+    this.textSegments = [''];
+  }
+}
+  
   set animationSpeed(val: number) { this._animationSpeed = val; }
   get animationSpeed() { return this._animationSpeed; }
 
