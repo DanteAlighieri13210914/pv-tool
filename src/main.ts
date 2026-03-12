@@ -835,12 +835,13 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
     } catch (_) {}
   }
 
+  const OFFSET_MS = parseInt(new URLSearchParams(window.location.search).get('offset') ?? '200');
   async function pollPosition() {
     if (!lrcLines.length) return;
     try {
       const r = await fetch(`${NP_BASE}/api/query/progress`, { signal: AbortSignal.timeout(800) });
       const d = await r.json();
-      injectLyric(getLineAt(d.progress ?? 0));
+      injectLyric(getLineAt((d.progress ?? 0) + OFFSET_MS));
     } catch (_) {}
   }
 
