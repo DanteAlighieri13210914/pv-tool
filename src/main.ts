@@ -192,6 +192,15 @@ app.innerHTML = `
 
     <div class="controls controls-bottom" id="custom-panel" style="display:none">
       <div class="panel-title">${t('effects_library')}</div>
+      <div class="control-group" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
+  <span style="font-size:11px;color:#aaa;width:100%">预设槽位</span>
+  <button class="btn btn-sm" id="save-slot-1">💾 存1</button>
+  <button class="btn btn-sm" id="load-slot-1">📂 载1</button>
+  <button class="btn btn-sm" id="save-slot-2">💾 存2</button>
+  <button class="btn btn-sm" id="load-slot-2">📂 载2</button>
+  <button class="btn btn-sm" id="save-slot-3">💾 存3</button>
+  <button class="btn btn-sm" id="load-slot-3">📂 载3</button>
+</div>
       <div id="effect-grid">
         ${(() => {
           function fxKey(e: typeof effectCatalog[0]): string {
