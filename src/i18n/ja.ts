@@ -131,6 +131,7 @@ export const ja: Record<LocaleKey, string> = {
   'fx_centeredSquares': 'センタースクエア Squares',
   'fx_balancingCircles': 'バランス円 Circles',
   'fx_radialRectangles': '放射矩形 RadialRect',
+  'fx_starTrail': '星軌 StarTrail',
   'fx_flowingLines': 'フローライン Lines',
   'fx_diagonalFill': '斜線フィル Diagonal',
   'fx_diagonalHatch': '斜線ハッチ Hatch',

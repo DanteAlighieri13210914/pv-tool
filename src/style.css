@@ -41,8 +41,36 @@ body {
   gap: 12px;
   backdrop-filter: blur(10px);
   min-width: 220px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 0.85rem;
+}
+
+.collapsible-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.collapsible-section > summary.panel-title {
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.collapsible-section > summary.panel-title::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-section > summary.panel-title::before {
+  content: '▼ ';
+  font-size: 0.65em;
+  vertical-align: middle;
+}
+
+.collapsible-section:not([open]) > summary.panel-title::before {
+  content: '▶ ';
 }
 
 .controls-right {

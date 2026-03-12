@@ -30,6 +30,7 @@ export const effectCatalog: EffectPreset[] = [
   { type: 'centeredSquares', label: '居中方块 Squares', category: '几何装饰', layer: 'decoration', config: {} },
   { type: 'balancingCircles', label: '平衡圆 Circles', category: '几何装饰', layer: 'decoration', config: { count: 5, blueColor: '#0028B4' } },
   { type: 'radialRectangles', label: '放射矩形 RadialRect', category: '几何装饰', layer: 'decoration', config: { count: 14, baseColor: '#1133aa', edgeColor: '#cccc00' } },
+  { type: 'starTrail', label: '星轨 StarTrail', category: '几何装饰', layer: 'decoration', config: { count: 20 } },
 
   // 线条结构 Lines
   { type: 'flowingLines', label: '流动线条 Lines', category: '线条结构', layer: 'decoration', config: { color: '$secondary', count: 20 } },

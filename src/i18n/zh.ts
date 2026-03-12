@@ -129,6 +129,7 @@ export const zh = {
   'fx_centeredSquares': '居中方块 Squares',
   'fx_balancingCircles': '平衡圆 Circles',
   'fx_radialRectangles': '放射矩形 RadialRect',
+  'fx_starTrail': '星轨 StarTrail',
   'fx_flowingLines': '流动线条 Lines',
   'fx_diagonalFill': '斜线填充 Diagonal',
   'fx_diagonalHatch': '斜线网格 Hatch',

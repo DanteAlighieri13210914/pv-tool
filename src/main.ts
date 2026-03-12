@@ -29,37 +29,38 @@ function tplName(tpl: TemplateConfig): string {
 app.innerHTML = `
   <div class="panels-wrapper" id="panels-wrapper">
     <div class="controls">
-      <div class="control-group">
-        <label class="label-with-action">${t('template')} <button class="btn btn-sm btn-label" id="tpl-import" title="${t('import_code')}">${t('import_code')}</button></label>
-        <select id="template-select">
-          ${templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('')}
-          <option value="custom">${t('custom')}</option>
-        </select>
-        <div class="template-actions">
-          <button class="btn btn-sm" id="tpl-save" title="${t('save_tpl')}" style="display:none">${t('save_tpl')}</button>
-          <button class="btn btn-sm" id="tpl-delete" title="${t('delete_tpl')}" style="display:none">${t('delete_tpl')}</button>
-          <button class="btn btn-sm" id="tpl-export" title="${t('export_code')}" style="display:none">${t('export_code')}</button>
+      <details class="collapsible-section" open>
+        <summary class="panel-title">${t('template')}</summary>
+        <div class="control-group">
+          <label class="label-with-action"><button class="btn btn-sm btn-label" id="tpl-import" title="${t('import_code')}">${t('import_code')}</button></label>
+          <select id="template-select">
+            ${templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('')}
+            <option value="custom">${t('custom')}</option>
+          </select>
+          <div class="template-actions">
+            <button class="btn btn-sm" id="tpl-save" title="${t('save_tpl')}" style="display:none">${t('save_tpl')}</button>
+            <button class="btn btn-sm" id="tpl-delete" title="${t('delete_tpl')}" style="display:none">${t('delete_tpl')}</button>
+            <button class="btn btn-sm" id="tpl-export" title="${t('export_code')}" style="display:none">${t('export_code')}</button>
+          </div>
+          <div id="tpl-save-input" class="tpl-inline-input" style="display:none">
+            <input type="text" id="tpl-name-input" placeholder="${t('tpl_name_placeholder')}">
+            <button class="btn btn-sm" id="tpl-save-ok">${t('confirm')}</button>
+            <button class="btn btn-sm" id="tpl-save-cancel">${t('cancel')}</button>
+          </div>
+          <div id="tpl-delete-confirm" class="tpl-inline-input" style="display:none">
+            <span class="tpl-confirm-text" id="tpl-delete-text"></span>
+            <button class="btn btn-sm btn-danger" id="tpl-delete-ok">${t('delete_tpl')}</button>
+            <button class="btn btn-sm" id="tpl-delete-cancel">${t('cancel')}</button>
+          </div>
         </div>
-        <div id="tpl-save-input" class="tpl-inline-input" style="display:none">
-          <input type="text" id="tpl-name-input" placeholder="${t('tpl_name_placeholder')}">
-          <button class="btn btn-sm" id="tpl-save-ok">${t('confirm')}</button>
-          <button class="btn btn-sm" id="tpl-save-cancel">${t('cancel')}</button>
+        <div class="control-group" id="share-code-group" style="display:none">
+          <label id="share-code-label">${t('share_code')}</label>
+          <textarea id="share-code-text" rows="3" placeholder="${t('paste_code')}"></textarea>
+          <div class="template-actions">
+            <button class="btn btn-sm" id="share-code-ok">${t('confirm')}</button>
+            <button class="btn btn-sm" id="share-code-cancel">${t('cancel')}</button>
+          </div>
         </div>
-        <div id="tpl-delete-confirm" class="tpl-inline-input" style="display:none">
-          <span class="tpl-confirm-text" id="tpl-delete-text"></span>
-          <button class="btn btn-sm btn-danger" id="tpl-delete-ok">${t('delete_tpl')}</button>
-          <button class="btn btn-sm" id="tpl-delete-cancel">${t('cancel')}</button>
-        </div>
-      </div>
-      <div class="control-group" id="share-code-group" style="display:none">
-        <label id="share-code-label">${t('share_code')}</label>
-        <textarea id="share-code-text" rows="3" placeholder="${t('paste_code')}"></textarea>
-        <div class="template-actions">
-          <button class="btn btn-sm" id="share-code-ok">${t('confirm')}</button>
-          <button class="btn btn-sm" id="share-code-cancel">${t('cancel')}</button>
-        </div>
-      </div>
-
       <div class="control-group">
         <label>${t('canvas_color')}</label>
         <div class="color-swatches" id="canvas-color-swatches">
@@ -158,74 +159,78 @@ app.innerHTML = `
         <label>${t('beat_react')} <span id="beat-val">0.5</span></label>
         <input type="range" id="beat-slider" min="0" max="1" step="0.05" value="0.5">
       </div>
+      </details>
     </div>
 
     <div class="controls controls-right">
-      <div class="panel-title">${t('postfx')}</div>
+      <details class="collapsible-section" open>
+        <summary class="panel-title">${t('postfx')}</summary>
 
-      <div class="control-group">
-        <label>${t('shake')} <span id="shake-val">0</span></label>
-        <input type="range" id="shake-slider" min="0" max="1" step="0.05" value="0">
-      </div>
-
-      <div class="control-group">
-        <label>${t('zoom')} <span id="zoom-val">0</span></label>
-        <input type="range" id="zoom-slider" min="-1" max="1" step="0.05" value="0">
-      </div>
-
-      <div class="control-group">
-        <label>${t('tilt')} <span id="tilt-val">0°</span></label>
-        <input type="range" id="tilt-slider" min="-1" max="1" step="0.05" value="0">
-      </div>
-
-      <div class="control-group">
-        <label>${t('glitch')} <span id="glitch-val">0</span></label>
-        <input type="range" id="glitch-slider" min="0" max="1" step="0.05" value="0">
-      </div>
-
-      <div class="control-group">
-        <label>${t('hue_shift')} <span id="hue-val">0°</span></label>
-        <input type="range" id="hue-slider" min="-180" max="180" step="5" value="0">
-      </div>
-
-      <div class="control-group" id="media-pos-group" style="display:none">
-        <label>${t('media_position')}</label>
-        <div class="slider-row">
-          <span class="slider-label">${t('offset_x')}</span>
-          <input type="range" id="media-x" min="-500" max="500" step="5" value="0">
-          <span id="media-x-val">0</span>
+        <div class="control-group">
+          <label>${t('shake')} <span id="shake-val">0</span></label>
+          <input type="range" id="shake-slider" min="0" max="1" step="0.05" value="0">
         </div>
-        <div class="slider-row">
-          <span class="slider-label">${t('offset_y')}</span>
-          <input type="range" id="media-y" min="-500" max="500" step="5" value="0">
-          <span id="media-y-val">0</span>
-        </div>
-        <div class="slider-row">
-          <span class="slider-label">${t('scale')}</span>
-          <input type="range" id="media-scale" min="0.5" max="3" step="0.05" value="1">
-          <span id="media-scale-val">1.0x</span>
-        </div>
-      </div>
 
-      <div class="control-group">
-        <label class="effect-toggle">
-          <input type="checkbox" id="alpha-toggle">
-          <span>${t('alpha_export')}</span>
-        </label>
-      </div>
+        <div class="control-group">
+          <label>${t('zoom')} <span id="zoom-val">0</span></label>
+          <input type="range" id="zoom-slider" min="-1" max="1" step="0.05" value="0">
+        </div>
 
-      <div class="control-group rec-group">
-        <button id="rec-btn" class="btn rec-btn" title="${t('rec')}">
-          <span class="rec-icon"></span>
-          <span id="rec-label">${t('rec')}</span>
-        </button>
-        <span id="rec-timer" class="rec-timer"></span>
-      </div>
+        <div class="control-group">
+          <label>${t('tilt')} <span id="tilt-val">0°</span></label>
+          <input type="range" id="tilt-slider" min="-1" max="1" step="0.05" value="0">
+        </div>
+
+        <div class="control-group">
+          <label>${t('glitch')} <span id="glitch-val">0</span></label>
+          <input type="range" id="glitch-slider" min="0" max="1" step="0.05" value="0">
+        </div>
+
+        <div class="control-group">
+          <label>${t('hue_shift')} <span id="hue-val">0°</span></label>
+          <input type="range" id="hue-slider" min="-180" max="180" step="5" value="0">
+        </div>
+
+        <div class="control-group" id="media-pos-group" style="display:none">
+          <label>${t('media_position')}</label>
+          <div class="slider-row">
+            <span class="slider-label">${t('offset_x')}</span>
+            <input type="range" id="media-x" min="-500" max="500" step="5" value="0">
+            <span id="media-x-val">0</span>
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">${t('offset_y')}</span>
+            <input type="range" id="media-y" min="-500" max="500" step="5" value="0">
+            <span id="media-y-val">0</span>
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">${t('scale')}</span>
+            <input type="range" id="media-scale" min="0.5" max="3" step="0.05" value="1">
+            <span id="media-scale-val">1.0x</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="effect-toggle">
+            <input type="checkbox" id="alpha-toggle">
+            <span>${t('alpha_export')}</span>
+          </label>
+        </div>
+
+        <div class="control-group rec-group">
+          <button id="rec-btn" class="btn rec-btn" title="${t('rec')}">
+            <span class="rec-icon"></span>
+            <span id="rec-label">${t('rec')}</span>
+          </button>
+          <span id="rec-timer" class="rec-timer"></span>
+        </div>
+      </details>
     </div>
 
     <div class="controls controls-bottom" id="custom-panel" style="display:none">
-      <div class="panel-title">${t('effects_library')}</div>
-      <div id="effect-grid">
+      <details class="collapsible-section" open>
+        <summary class="panel-title">${t('effects_library')}</summary>
+        <div id="effect-grid">
         ${(() => {
           function fxKey(e: typeof effectCatalog[0]): string {
             if (e.type === 'organicBlob') return 'fx_organicBlob_' + (e.config.shape ?? 'blob');
@@ -250,6 +255,7 @@ app.innerHTML = `
           `).join('');
         })()}
       </div>
+      </details>
     </div>
   </div>
 

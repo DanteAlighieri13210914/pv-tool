@@ -66,6 +66,7 @@ import { EdgeClouds } from './edgeClouds';
 import { PinkStripes } from './pinkStripes';
 import { JigsawGrid } from './jigsawGrid';
 import { PaperTear } from './paperTear';
+import { StarTrail } from './starTrail';
 
 type EffectConstructor = new () => BaseEffect;
 
@@ -136,6 +137,7 @@ register('edgeClouds', EdgeClouds);
 register('pinkStripes', PinkStripes);
 register('jigsawGrid', JigsawGrid);
 register('paperTear', PaperTear);
+register('starTrail', StarTrail);
 
 export function createEffect(
   type: string,
