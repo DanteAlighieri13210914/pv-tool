@@ -321,6 +321,16 @@ function syncOpacitySlider() {
   opacityVal.textContent = `${Math.round(v * 100)}%`;
 }
 
+document.getElementById('template-buttons')!.addEventListener('click', (e) => {
+  const btn = (e.target as HTMLElement).closest('.tpl-btn') as HTMLButtonElement | null;
+  if (!btn) return;
+  document.querySelectorAll('.tpl-btn').forEach(b => (b as HTMLElement).style.background = '#333');
+  btn.style.background = '#6688cc';
+  const idx = btn.dataset.idx!;
+  templateSelect.value = idx;
+  templateSelect.dispatchEvent(new Event('change'));
+});
+
 templateSelect.addEventListener('change', () => {
   const val = templateSelect.value;
   if (val === 'custom') {
