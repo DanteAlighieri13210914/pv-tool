@@ -787,10 +787,10 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
   }
 
   function injectLyric(text: string) {
-    if (!text || text === lastLine) return;
-    lastLine = text;
-    engine.setText(text + '/' + text);
-  }
+  if (!text || text === lastLine) return;
+  lastLine = text;
+  engine.setTextLive(text + '/' + text);
+}
 
   async function refreshLyric() {
     try {
