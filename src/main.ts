@@ -260,14 +260,34 @@ app.innerHTML = `
 const engine = new PVEngine();
 const container = document.getElementById('pv-container')!;
 
+
 engine.init(container).then(() => {
   engine.setText('深夜東京/の6畳半夢/を見てた/灯りの灯らない蛍光灯/明日には消えてる電脳城/に/開幕戦/打ち上げて/いなくなんないよね/ここには誰もいない/ここには誰もいないから');
-  engine.loadTemplate(templates[0]);
-  templateSelect.value = '0';
+
+  // OBS 透明模式 
+  if (new URLSearchParams(window.location.search).get('obs') === '1') {
+    engine.alphaMode = true;
+    document.body.style.background = 'transparent';
+    document.documentElement.style.background = 'transparent';
+  }
+
+  // URL参数指定模板
+  const tParam = new URLSearchParams(window.location.search).get('t');
+if (tParam === 'custom') {
+  templateSelect.value = 'custom';
+  customPanel.style.display = '';
+  isCustomMode = true;
+} else {
+  const tIdx = tParam !== null && !isNaN(parseInt(tParam)) ? parseInt(tParam) : 0;
+  engine.loadTemplate(templates[tIdx]);
+  templateSelect.value = String(tIdx);
+}
+  
   syncSpeedSlider();
   syncOpacitySlider();
 });
 
+ 
 // Mobile toggle
 const mobileToggle = document.getElementById('mobile-toggle')!;
 const panelsWrapper = document.getElementById('panels-wrapper')!;
@@ -352,6 +372,7 @@ templateSelect.addEventListener('change', () => {
     engine.loadTemplate(templates[parseInt(val)]);
     syncSpeedSlider();
     syncOpacitySlider();
+    localStorage.setItem('pv-template', val);
   }
   updateTemplateButtons();
 });
@@ -954,3 +975,100 @@ recBtn.addEventListener('click', () => {
     recTimer.textContent = formatTime(performance.now() - recStartTime);
   }, 500);
 });
+
+// ══════════════════════════════════════════════════════════
+//  OBS 透明输出模式  (?obs=1)
+//  本地运行: npm run dev
+//  OBS 浏览器源 URL: http://localhost:5173/?obs=1
+// ══════════════════════════════════════════════════════════
+
+if (new URLSearchParams(window.location.search).get('obs') === '1') {
+  // 隐藏面板
+  (document.getElementById('panels-wrapper') as HTMLElement).style.display = 'none';
+  (document.getElementById('mobile-toggle') as HTMLElement).style.display = 'none';
+
+  // 按 H 键切换面板显示
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'h' || e.key === 'H') {
+      const panels = document.getElementById('panels-wrapper')!;
+      const toggle = document.getElementById('mobile-toggle')!;
+      const hidden = panels.style.display === 'none';
+      panels.style.display = hidden ? '' : 'none';
+      toggle.style.display = hidden ? '' : 'none';
+    }
+  });
+
+  
+  // ── Now Playing 歌词同步 ──
+  const NP_BASE       = 'http://localhost:9863';
+  const LYRIC_REFRESH = 5000;
+  const POSITION_POLL = 150;
+
+  let lrcLines:  { ms: number; text: string }[] = [];
+  let cachedLrc  = '';
+  let lastLine   = '';
+
+  function parseLRC(str: string) {
+    const re = /\[(\d{2}):(\d{2})[.:](\d{2,3})\](.+)/g;
+    const lines: { ms: number; text: string }[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(str)) !== null) {
+      const ms = (parseInt(m[1]) * 60 + parseInt(m[2])) * 1000
+               + parseInt(m[3].padEnd(3, '0'));
+      const text = m[4].trim();
+      if (text) lines.push({ ms, text });
+    }
+    return lines.sort((a, b) => a.ms - b.ms);
+  }
+
+  function getLineAt(posMs: number): string {
+    let result = '';
+    for (const { ms, text } of lrcLines) {
+      if (posMs >= ms) result = text;
+      else break;
+    }
+    return result;
+  }
+
+  function injectLyric(text: string) {
+    if (!text || text === lastLine) return;
+    lastLine = text;
+    engine.setText(text + '/' + text);
+  }
+
+  async function refreshLyric() {
+    try {
+      const r = await fetch(`${NP_BASE}/api/lyric`, { signal: AbortSignal.timeout(800) });
+      const d = await r.json();
+      if (d.lrc && d.lrc !== cachedLrc) {
+        cachedLrc = d.lrc;
+        lrcLines  = parseLRC(d.lrc);
+        lastLine  = '';
+        console.log('[obs-lyric] 歌词加载:', lrcLines.length, '行');
+      }
+    } catch (_) {}
+  }
+
+  async function pollPosition() {
+    if (!lrcLines.length) return;
+    try {
+      const r = await fetch(`${NP_BASE}/api/query/progress`, { signal: AbortSignal.timeout(800) });
+      const d = await r.json();
+      injectLyric(getLineAt(d.progress ?? 0));
+    } catch (_) {}
+  }
+
+  // Worker 计时防主线程节流
+  const worker = new Worker(URL.createObjectURL(new Blob([`
+    setInterval(() => postMessage('lyric'), ${LYRIC_REFRESH});
+    setInterval(() => postMessage('pos'),   ${POSITION_POLL});
+  `], { type: 'text/javascript' })));
+
+  worker.onmessage = (e: MessageEvent) => {
+    if (e.data === 'lyric') refreshLyric();
+    if (e.data === 'pos')   pollPosition();
+  };
+
+  refreshLyric();
+  console.log('[obs-lyric] OBS 透明模式启动');
+}

@@ -188,8 +188,10 @@ export class PVEngine {
       if (this._bgColorOverride) {
         this.palette.background = this._bgColorOverride;
       }
-      this.app.renderer.background.color = new PIXI.Color(this.palette.background).toNumber();
-      this.updateBgFill();
+      if (!this._alphaMode) {
+  this.app.renderer.background.color = new PIXI.Color(this.palette.background).toNumber();
+  this.updateBgFill();  
+}
 
       for (const entry of template.effects) {
         const layer = this.layers.get(entry.layer);
@@ -333,16 +335,18 @@ export class PVEngine {
   get effectOpacity() { return this._effectOpacity; }
 
   set alphaMode(val: boolean) {
-    this._alphaMode = val;
-    const bgLayer = this.layers.get('background');
-    if (val) {
-      this.bgFill.visible = false;
-      if (bgLayer) bgLayer.visible = false;
-    } else {
-      this.bgFill.visible = true;
-      if (bgLayer) bgLayer.visible = true;
-    }
+  this._alphaMode = val;
+  const bgLayer = this.layers.get('background');
+  if (val) {
+    if (this.bgFill) this.bgFill.visible = false;
+    if (bgLayer) bgLayer.visible = false;
+    if (this.app.renderer) this.app.renderer.background.alpha = 0;
+  } else {
+    if (this.bgFill) this.bgFill.visible = true;
+    if (bgLayer) bgLayer.visible = true;
+    if (this.app.renderer) this.app.renderer.background.alpha = 1;
   }
+}
   get alphaMode() { return this._alphaMode; }
 
   private updateBgFill() {
