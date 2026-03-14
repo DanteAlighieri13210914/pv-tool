@@ -1,4 +1,7 @@
 export const zh = {
+  // Page
+  'page_title': 'PV Tool - 日式PV Visual生成',
+
   // Panel titles
   'postfx': '後期 Post FX',
   'effects_library': '效果库 Effects',
@@ -78,17 +81,30 @@ export const zh = {
   'tpl_spiderWeb': '蛛网',
   'tpl_staggeredText': '错落文字',
   'tpl_calmVillain': '冷静的反派',
+  'tpl_girlyClouds': '少女云朵',
+  'tpl_sweetPink': '格子花边',
+  'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
 
   // File picker
   'choose_file': '选择文件',
   'no_file': '未选择文件',
 
-  // Sharecode
-  'export_code': '导出配置码',
-  'import_code': '导入配置码',
+  // Sharecode & template management
+  'export_code': '导出分享码',
+  'import_code': '导入分享码',
   'import_btn': '导入',
   'code_copied': '已复制',
-  'code_invalid': '配置码无效',
+  'code_invalid': '分享码无效',
+  'save_tpl': '保存',
+  'delete_tpl': '删除',
+  'confirm': '确认',
+  'cancel': '取消',
+  'tpl_name_placeholder': '输入模板名称...',
+  'confirm_delete': '确认删除',
+  'share_code': '分享码 Share Code',
+  'copy': '复制',
+  'paste_code': '粘贴分享码...',
+
 
   // Effect categories (used in custom panel)
   'ecat_背景': '背景',
@@ -118,6 +134,8 @@ export const zh = {
   'fx_centeredSquares': '居中方块 Squares',
   'fx_balancingCircles': '平衡圆 Circles',
   'fx_radialRectangles': '放射矩形 RadialRect',
+  'fx_starTrail': '星轨 StarTrail',
+  'fx_planet': '行星 Planet',
   'fx_flowingLines': '流动线条 Lines',
   'fx_diagonalFill': '斜线填充 Diagonal',
   'fx_diagonalHatch': '斜线网格 Hatch',
@@ -135,6 +153,7 @@ export const zh = {
   'fx_textStrip': '文字条 Strip',
   'fx_textCards': '文字卡片 Cards',
   'fx_bigOutlineText': '大字描边 BigText',
+  'fx_cuteOutlineText': '可爱描边 CuteText',
   'fx_layeredText': '叠层文字 Layered',
   'fx_glowTextCards': '发光卡片字 GlowCards',
   'fx_verticalSubText': '竖排副文字 VertSub',
@@ -166,6 +185,9 @@ export const zh = {
   'fx_jigsawGrid': '拼图网格 Jigsaw',
   'fx_edgeClouds': '边缘云朵 EdgeClouds',
   'fx_pinkStripes': '粉色条纹 PinkStripes',
+  'fx_pinkGrid': '粉色格子 PinkGrid',
+  'fx_scalloppedBorder': '上下花边 Scallop',
+  'fx_pulsingCircle': '跃动圆形 Pulse',
 } as const;
 
 export type LocaleKey = keyof typeof zh;
