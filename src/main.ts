@@ -3,13 +3,21 @@
 
 import './style.css';
 import { PVEngine } from './core/engine';
+import { parseLrc } from './core/lrc';
 import { templates } from './templates';
 import { effectCatalog } from './core/effectCatalog';
 import type { TemplateConfig } from './core/types';
 import { t } from './i18n';
-
+import {
+  loadCustomTemplates,
+  saveCustomTemplates,
+  encodeShareCode,
+  decodeShareCode,
+} from './core/templateStore';
 
 console.log('%cPV Tool%c solaris:0914', 'color:#6688cc;font-weight:bold', 'color:#888');
+
+document.title = t('page_title');
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
@@ -23,24 +31,23 @@ function tplName(tpl: TemplateConfig): string {
 app.innerHTML = `
   <div class="panels-wrapper" id="panels-wrapper">
     <div class="controls">
+      <details class="collapsible-section" open>
+        <summary class="panel-title">${t('template')}</summary>
       <div class="control-group">
-  <label>${t('template')}</label>
-  <div id="template-buttons" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">
-    ${templates.map((tp, i) => `
-      <button class="tpl-btn" data-idx="${i}" style="padding:4px 8px;font-size:11px;cursor:pointer;background:#333;color:#fff;border:1px solid #555;border-radius:3px;">
-        ${tplName(tp)}
-      </button>
-    `).join('')}
-    <button class="tpl-btn" data-idx="custom" style="padding:4px 8px;font-size:11px;cursor:pointer;background:#333;color:#fff;border:1px solid #555;border-radius:3px;">
-      ${t('custom')}
-    </button>
-  </div>
-  <select id="template-select" style="display:none">
-    ${templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('')}
-    <option value="custom">${t('custom')}</option>
-  </select>
-</div>
-
+          <select id="template-select">
+            ${templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('')}
+            <option value="custom">${t('custom')}</option>
+          </select>
+          <div class="template-actions">
+            <button class="btn btn-sm" id="tpl-delete" title="${t('delete_tpl')}" style="display:none">${t('delete_tpl')}</button>
+            <button class="btn btn-sm" id="tpl-export" title="${t('export_code')}" style="display:none">${t('export_code')}</button>
+          </div>
+          <div id="tpl-delete-confirm" class="tpl-inline-input" style="display:none">
+            <span class="tpl-confirm-text" id="tpl-delete-text"></span>
+            <button class="btn btn-sm btn-danger" id="tpl-delete-ok">${t('delete_tpl')}</button>
+            <button class="btn btn-sm" id="tpl-delete-cancel">${t('cancel')}</button>
+          </div>
+        </div>
       <div class="control-group">
         <label>${t('canvas_color')}</label>
         <div class="color-swatches" id="canvas-color-swatches">
@@ -117,6 +124,20 @@ app.innerHTML = `
       </div>
 
       <div class="control-group">
+        <label>LRC</label>
+        <div class="file-pick">
+          <button class="btn btn-sm" id="lrc-pick-btn">导入 LRC</button>
+          <span class="file-pick-name" id="lrc-pick-name">未选择文件</span>
+          <input type="file" id="lrc-input" accept=".lrc,text/plain" hidden>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>计时 Time</label>
+        <div id="playback-time">00:00 / 00:00</div>
+      </div>
+
+      <div class="control-group">
         <label>${t('bpm')} <span id="bpm-val">120</span></label>
         <input type="range" id="bpm-slider" min="30" max="240" step="1" value="120">
       </div>
@@ -125,83 +146,99 @@ app.innerHTML = `
         <label>${t('beat_react')} <span id="beat-val">0.5</span></label>
         <input type="range" id="beat-slider" min="0" max="1" step="0.05" value="0.5">
       </div>
+      </details>
     </div>
 
     <div class="controls controls-right">
-      <div class="panel-title">${t('postfx')}</div>
+      <details class="collapsible-section" open>
+        <summary class="panel-title">${t('postfx')}</summary>
 
-      <div class="control-group">
-        <label>${t('shake')} <span id="shake-val">0</span></label>
-        <input type="range" id="shake-slider" min="0" max="1" step="0.05" value="0">
-      </div>
-
-      <div class="control-group">
-        <label>${t('zoom')} <span id="zoom-val">0</span></label>
-        <input type="range" id="zoom-slider" min="-1" max="1" step="0.05" value="0">
-      </div>
-
-      <div class="control-group">
-        <label>${t('tilt')} <span id="tilt-val">0°</span></label>
-        <input type="range" id="tilt-slider" min="-1" max="1" step="0.05" value="0">
-      </div>
-
-      <div class="control-group">
-        <label>${t('glitch')} <span id="glitch-val">0</span></label>
-        <input type="range" id="glitch-slider" min="0" max="1" step="0.05" value="0">
-      </div>
-
-      <div class="control-group">
-        <label>${t('hue_shift')} <span id="hue-val">0°</span></label>
-        <input type="range" id="hue-slider" min="-180" max="180" step="5" value="0">
-      </div>
-
-      <div class="control-group" id="media-pos-group" style="display:none">
-        <label>${t('media_position')}</label>
-        <div class="slider-row">
-          <span class="slider-label">${t('offset_x')}</span>
-          <input type="range" id="media-x" min="-500" max="500" step="5" value="0">
-          <span id="media-x-val">0</span>
+        <div class="control-group">
+          <label>${t('shake')} <span id="shake-val">0</span></label>
+          <input type="range" id="shake-slider" min="0" max="1" step="0.05" value="0">
         </div>
-        <div class="slider-row">
-          <span class="slider-label">${t('offset_y')}</span>
-          <input type="range" id="media-y" min="-500" max="500" step="5" value="0">
-          <span id="media-y-val">0</span>
-        </div>
-        <div class="slider-row">
-          <span class="slider-label">${t('scale')}</span>
-          <input type="range" id="media-scale" min="0.5" max="3" step="0.05" value="1">
-          <span id="media-scale-val">1.0x</span>
-        </div>
-      </div>
 
-      <div class="control-group">
-        <label class="effect-toggle">
-          <input type="checkbox" id="alpha-toggle">
-          <span>${t('alpha_export')}</span>
-        </label>
-      </div>
+        <div class="control-group">
+          <label>${t('zoom')} <span id="zoom-val">0</span></label>
+          <input type="range" id="zoom-slider" min="-1" max="1" step="0.05" value="0">
+        </div>
 
-      <div class="control-group rec-group">
-        <button id="rec-btn" class="btn rec-btn" title="${t('rec')}">
-          <span class="rec-icon"></span>
-          <span id="rec-label">${t('rec')}</span>
-        </button>
-        <span id="rec-timer" class="rec-timer"></span>
-      </div>
+        <div class="control-group">
+          <label>${t('tilt')} <span id="tilt-val">0°</span></label>
+          <input type="range" id="tilt-slider" min="-1" max="1" step="0.05" value="0">
+        </div>
+
+        <div class="control-group">
+          <label>${t('glitch')} <span id="glitch-val">0</span></label>
+          <input type="range" id="glitch-slider" min="0" max="1" step="0.05" value="0">
+        </div>
+
+        <div class="control-group">
+          <label>${t('hue_shift')} <span id="hue-val">0°</span></label>
+          <input type="range" id="hue-slider" min="-180" max="180" step="5" value="0">
+        </div>
+
+        <div class="control-group" id="media-pos-group" style="display:none">
+          <label>${t('media_position')}</label>
+          <div class="slider-row">
+            <span class="slider-label">${t('offset_x')}</span>
+            <input type="range" id="media-x" min="-500" max="500" step="5" value="0">
+            <span id="media-x-val">0</span>
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">${t('offset_y')}</span>
+            <input type="range" id="media-y" min="-500" max="500" step="5" value="0">
+            <span id="media-y-val">0</span>
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">${t('scale')}</span>
+            <input type="range" id="media-scale" min="0.5" max="3" step="0.05" value="1">
+            <span id="media-scale-val">1.0x</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="effect-toggle">
+            <input type="checkbox" id="alpha-toggle">
+            <span>${t('alpha_export')}</span>
+          </label>
+        </div>
+
+        <div class="control-group rec-group">
+          <button id="rec-btn" class="btn rec-btn" title="${t('rec')}">
+            <span class="rec-icon"></span>
+            <span id="rec-label">${t('rec')}</span>
+          </button>
+          <span id="rec-timer" class="rec-timer"></span>
+        </div>
+      </details>
     </div>
 
     <div class="controls controls-bottom" id="custom-panel" style="display:none">
-      <div class="panel-title">${t('effects_library')}</div>
-      <div class="control-group" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
-  <span style="font-size:11px;color:#aaa;width:100%">预设槽位</span>
-  <button class="btn btn-sm" id="save-slot-1">💾 存1</button>
-  <button class="btn btn-sm" id="load-slot-1">📂 载1</button>
-  <button class="btn btn-sm" id="save-slot-2">💾 存2</button>
-  <button class="btn btn-sm" id="load-slot-2">📂 载2</button>
-  <button class="btn btn-sm" id="save-slot-3">💾 存3</button>
-  <button class="btn btn-sm" id="load-slot-3">📂 载3</button>
-</div>
-      <div id="effect-grid">
+      <details class="collapsible-section" open>
+        <summary class="panel-title">${t('effects_library')}</summary>
+        <div class="control-group">
+          <div class="template-actions">
+            <button class="btn btn-sm" id="tpl-save" title="${t('save_tpl')}">${t('save_tpl')}</button>
+            <button class="btn btn-sm" id="tpl-import" title="${t('import_code')}">${t('import_code')}</button>
+          </div>
+        </div>
+        <div class="control-group" id="tpl-save-input" style="display:none">
+          <div class="tpl-inline-input">
+            <input type="text" id="tpl-name-input" placeholder="${t('tpl_name_placeholder')}">
+            <button class="btn btn-sm" id="tpl-save-ok">${t('confirm')}</button>
+            <button class="btn btn-sm" id="tpl-save-cancel">${t('cancel')}</button>
+          </div>
+        </div>
+        <div class="control-group" id="share-code-group" style="display:none">
+          <label id="share-code-label">${t('share_code')}</label>
+          <input type="text" id="share-code-text" placeholder="${t('paste_code')}">
+          <div class="template-actions">
+            <button class="btn btn-sm" id="share-code-ok">${t('confirm')}</button>
+            <button class="btn btn-sm" id="share-code-cancel">${t('cancel')}</button>
+          </div>
+        </div>
+        <div id="effect-grid">
         ${(() => {
           function fxKey(e: typeof effectCatalog[0]): string {
             if (e.type === 'organicBlob') return 'fx_organicBlob_' + (e.config.shape ?? 'blob');
@@ -226,6 +263,7 @@ app.innerHTML = `
           `).join('');
         })()}
       </div>
+      </details>
     </div>
   </div>
 
@@ -236,34 +274,33 @@ app.innerHTML = `
 const engine = new PVEngine();
 const container = document.getElementById('pv-container')!;
 
-
 engine.init(container).then(() => {
   engine.setText('深夜東京/の6畳半夢/を見てた/灯りの灯らない蛍光灯/明日には消えてる電脳城/に/開幕戦/打ち上げて/いなくなんないよね/ここには誰もいない/ここには誰もいないから');
 
-  // OBS 透明模式 
+  // OBS 透明模式
   if (new URLSearchParams(window.location.search).get('obs') === '1') {
     engine.alphaMode = true;
     document.body.style.background = 'transparent';
     document.documentElement.style.background = 'transparent';
   }
 
-  // URL参数指定模板
+  // URL参数指定模板 (?t=0 or ?t=custom)
   const tParam = new URLSearchParams(window.location.search).get('t');
-if (tParam === 'custom') {
-  templateSelect.value = 'custom';
-  customPanel.style.display = '';
-  isCustomMode = true;
-} else {
-  const tIdx = tParam !== null && !isNaN(parseInt(tParam)) ? parseInt(tParam) : 0;
-  engine.loadTemplate(templates[tIdx]);
-  templateSelect.value = String(tIdx);
-}
-  
+  if (tParam === 'custom') {
+    templateSelect.value = 'custom';
+    customPanel.style.display = '';
+    isCustomMode = true;
+  } else {
+    const tIdx = tParam !== null && !isNaN(parseInt(tParam)) ? parseInt(tParam) : 0;
+    engine.loadTemplate(templates[tIdx]);
+    templateSelect.value = String(tIdx);
+  }
+
   syncSpeedSlider();
   syncOpacitySlider();
+  syncPostfxSliders();
 });
 
- 
 // Mobile toggle
 const mobileToggle = document.getElementById('mobile-toggle')!;
 const panelsWrapper = document.getElementById('panels-wrapper')!;
@@ -330,15 +367,23 @@ function syncOpacitySlider() {
   opacityVal.textContent = `${Math.round(v * 100)}%`;
 }
 
-document.getElementById('template-buttons')!.addEventListener('click', (e) => {
-  const btn = (e.target as HTMLElement).closest('.tpl-btn') as HTMLButtonElement | null;
-  if (!btn) return;
-  document.querySelectorAll('.tpl-btn').forEach(b => (b as HTMLElement).style.background = '#333');
-  btn.style.background = '#6688cc';
-  const idx = btn.dataset.idx!;
-  templateSelect.value = idx;
-  templateSelect.dispatchEvent(new Event('change'));
-});
+function syncPostfxSliders() {
+  const sk = document.getElementById('shake-slider') as HTMLInputElement;
+  const sv = document.getElementById('shake-val')!;
+  const zm = document.getElementById('zoom-slider') as HTMLInputElement;
+  const zv = document.getElementById('zoom-val')!;
+  const tl = document.getElementById('tilt-slider') as HTMLInputElement;
+  const tv = document.getElementById('tilt-val')!;
+  const gl = document.getElementById('glitch-slider') as HTMLInputElement;
+  const gv = document.getElementById('glitch-val')!;
+  const hu = document.getElementById('hue-slider') as HTMLInputElement;
+  const hv = document.getElementById('hue-val')!;
+  sk.value = String(engine.shake); sv.textContent = engine.shake.toFixed(2);
+  zm.value = String(engine.zoom); zv.textContent = engine.zoom.toFixed(2);
+  tl.value = String(engine.tilt); tv.textContent = `${(engine.tilt * 17.2).toFixed(0)}°`;
+  gl.value = String(engine.glitch); gv.textContent = engine.glitch.toFixed(2);
+  hu.value = String(engine.hueShift); hv.textContent = `${engine.hueShift.toFixed(0)}°`;
+}
 
 templateSelect.addEventListener('change', () => {
   const val = templateSelect.value;
@@ -346,15 +391,179 @@ templateSelect.addEventListener('change', () => {
     isCustomMode = true;
     customPanel.style.display = '';
     engine.loadTemplate(buildCustomTemplate());
+  } else if (val.startsWith('user-')) {
+    isCustomMode = false;
+    customPanel.style.display = 'none';
+    const idx = parseInt(val.split('-')[1]);
+    engine.loadTemplate(customTemplates[idx]);
+    syncSpeedSlider();
+    syncPostfxSliders();
   } else {
     isCustomMode = false;
     customPanel.style.display = 'none';
     engine.loadTemplate(templates[parseInt(val)]);
     syncSpeedSlider();
     syncOpacitySlider();
-    localStorage.setItem('pv-template', val);
+    syncPostfxSliders();
+  }
+  updateTemplateButtons();
+});
+
+// ── Custom template management ──
+let customTemplates = loadCustomTemplates();
+
+function rebuildTemplateSelect() {
+  const builtInHtml = templates.map((tp, i) => `<option value="${i}">${tplName(tp)}</option>`).join('');
+  const customHtml = customTemplates.map((tp, i) =>
+    `<option value="user-${i}">⭐ ${tp.name}</option>`
+  ).join('');
+  templateSelect.innerHTML = builtInHtml + customHtml + `<option value="custom">${t('custom')}</option>`;
+}
+
+function updateTemplateButtons() {
+  const val = templateSelect.value;
+  const isUser = val.startsWith('user-');
+  tplDeleteBtn.style.display = isUser ? '' : 'none';
+  tplExportBtn.style.display = isUser ? '' : 'none';
+  tplSaveInput.style.display = 'none';
+  tplDeleteConfirm.style.display = 'none';
+}
+
+const tplSaveBtn = document.getElementById('tpl-save')!;
+const tplDeleteBtn = document.getElementById('tpl-delete')!;
+const tplExportBtn = document.getElementById('tpl-export')!;
+const tplImportBtn = document.getElementById('tpl-import')!;
+const tplSaveInput = document.getElementById('tpl-save-input')!;
+const tplNameInput = document.getElementById('tpl-name-input') as HTMLInputElement;
+const tplSaveOk = document.getElementById('tpl-save-ok')!;
+const tplSaveCancel = document.getElementById('tpl-save-cancel')!;
+const tplDeleteConfirm = document.getElementById('tpl-delete-confirm')!;
+const tplDeleteText = document.getElementById('tpl-delete-text')!;
+const tplDeleteOk = document.getElementById('tpl-delete-ok')!;
+const tplDeleteCancel = document.getElementById('tpl-delete-cancel')!;
+const shareCodeGroup = document.getElementById('share-code-group')!;
+const shareCodeLabel = document.getElementById('share-code-label')!;
+const shareCodeText = document.getElementById('share-code-text') as HTMLInputElement;
+const shareCodeOk = document.getElementById('share-code-ok')!;
+const shareCodeCancel = document.getElementById('share-code-cancel')!;
+
+let shareCodeMode: 'import' | 'export' = 'import';
+
+tplSaveBtn.addEventListener('click', () => {
+  tplSaveInput.style.display = '';
+  tplNameInput.value = '';
+  tplNameInput.focus();
+});
+
+tplSaveCancel.addEventListener('click', () => {
+  tplSaveInput.style.display = 'none';
+});
+
+function doSave() {
+  const name = tplNameInput.value.trim();
+  if (!name) return;
+  const tpl = { ...buildCustomTemplate(), name };
+  customTemplates.push(tpl);
+  saveCustomTemplates(customTemplates);
+  rebuildTemplateSelect();
+  templateSelect.value = `user-${customTemplates.length - 1}`;
+  isCustomMode = false;
+  customPanel.style.display = 'none';
+  engine.loadTemplate(tpl);
+  updateTemplateButtons();
+  syncSpeedSlider();
+}
+
+tplSaveOk.addEventListener('click', doSave);
+tplNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doSave();
+  if (e.key === 'Escape') tplSaveInput.style.display = 'none';
+});
+
+tplDeleteBtn.addEventListener('click', () => {
+  const val = templateSelect.value;
+  if (!val.startsWith('user-')) return;
+  const idx = parseInt(val.split('-')[1]);
+  tplDeleteText.textContent = `${t('confirm_delete')} "${customTemplates[idx].name}"？`;
+  tplDeleteConfirm.style.display = '';
+});
+
+tplDeleteCancel.addEventListener('click', () => {
+  tplDeleteConfirm.style.display = 'none';
+});
+
+tplDeleteOk.addEventListener('click', () => {
+  const val = templateSelect.value;
+  if (!val.startsWith('user-')) return;
+  const idx = parseInt(val.split('-')[1]);
+  customTemplates.splice(idx, 1);
+  saveCustomTemplates(customTemplates);
+  rebuildTemplateSelect();
+  templateSelect.value = '0';
+  engine.loadTemplate(templates[0]);
+  updateTemplateButtons();
+  syncSpeedSlider();
+  tplDeleteConfirm.style.display = 'none';
+});
+
+tplExportBtn.addEventListener('click', async () => {
+  const val = templateSelect.value;
+  if (!val.startsWith('user-')) return;
+  const idx = parseInt(val.split('-')[1]);
+  shareCodeMode = 'export';
+  shareCodeLabel.textContent = `${t('share_code')} (${t('code_copied')})`;
+  const code = await encodeShareCode(customTemplates[idx]);
+  shareCodeText.value = code;
+  shareCodeGroup.style.display = '';
+  shareCodeText.readOnly = true;
+  shareCodeOk.textContent = t('copy');
+  try { await navigator.clipboard.writeText(code); } catch { /* fallback */ }
+});
+
+tplImportBtn.addEventListener('click', () => {
+  shareCodeMode = 'import';
+  shareCodeLabel.classList.remove('label-error');
+  shareCodeLabel.textContent = t('import_code');
+  shareCodeText.value = '';
+  shareCodeText.readOnly = false;
+  shareCodeOk.textContent = t('import_btn');
+  shareCodeGroup.style.display = '';
+});
+
+shareCodeOk.addEventListener('click', async () => {
+  if (shareCodeMode === 'export') {
+    try { await navigator.clipboard.writeText(shareCodeText.value); } catch { /* noop */ }
+    shareCodeGroup.style.display = 'none';
+    return;
+  }
+  const code = shareCodeText.value.trim();
+  if (!code) return;
+  try {
+    const tpl = await decodeShareCode(code);
+    customTemplates.push(tpl);
+    saveCustomTemplates(customTemplates);
+    rebuildTemplateSelect();
+    const newIdx = customTemplates.length - 1;
+    templateSelect.value = `user-${newIdx}`;
+    isCustomMode = false;
+    customPanel.style.display = 'none';
+    engine.loadTemplate(tpl);
+    updateTemplateButtons();
+    syncSpeedSlider();
+    shareCodeGroup.style.display = 'none';
+  } catch (err) {
+    shareCodeLabel.textContent = t('code_invalid');
+    shareCodeLabel.classList.add('label-error');
+    console.warn('[PV] Share code decode failed:', err);
+    return;
   }
 });
+
+shareCodeCancel.addEventListener('click', () => {
+  shareCodeGroup.style.display = 'none';
+});
+
+rebuildTemplateSelect();
 
 let customRebuildTimer: ReturnType<typeof setTimeout>;
 effectGrid.addEventListener('change', () => {
@@ -368,27 +577,6 @@ effectGrid.addEventListener('change', () => {
       }
     }, 300);
   }
-});
-
-function saveSlot(n: number) {
-  const checks = effectGrid.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
-  const state: boolean[] = [];
-  checks.forEach(cb => state.push(cb.checked));
-  localStorage.setItem(`pv-slot-${n}`, JSON.stringify(state));
-}
-
-function loadSlot(n: number) {
-  const saved = localStorage.getItem(`pv-slot-${n}`);
-  if (!saved) return;
-  const state: boolean[] = JSON.parse(saved);
-  const checks = effectGrid.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
-  checks.forEach((cb, i) => { if (state[i] !== undefined) cb.checked = state[i]; });
-  if (isCustomMode) engine.loadTemplate(buildCustomTemplate());
-}
-
-[1,2,3].forEach(n => {
-  document.getElementById(`save-slot-${n}`)!.addEventListener('click', () => saveSlot(n));
-  document.getElementById(`load-slot-${n}`)!.addEventListener('click', () => loadSlot(n));
 });
 
 // Text input with auto-expand on focus
@@ -405,12 +593,59 @@ textInput.addEventListener('blur', () => {
 });
 
 let textTimer: ReturnType<typeof setTimeout>;
+
+function applyTextInput(rawText: string): void {
+  const hasTimestamps = /\[\d{1,2}:\d{2}/.test(rawText);
+  if (hasTimestamps) {
+    const parsed = parseLrc(rawText);
+    if (parsed.length > 0) {
+      engine.setLyricTimeline(parsed);
+      return;
+    }
+  }
+  engine.setText(rawText.replace(/\r?\n/g, '/'));
+}
+
 textInput.addEventListener('input', () => {
   clearTimeout(textTimer);
   textTimer = setTimeout(() => {
-    engine.setText(textInput.value);
+    applyTextInput(textInput.value);
   }, 400);
 });
+
+const lrcInput = document.getElementById('lrc-input') as HTMLInputElement;
+const lrcPickBtn = document.getElementById('lrc-pick-btn') as HTMLButtonElement;
+const lrcPickName = document.getElementById('lrc-pick-name')!;
+
+lrcPickBtn.addEventListener('click', () => lrcInput.click());
+
+lrcInput.addEventListener('change', async () => {
+  const file = lrcInput.files?.[0];
+  if (!file) return;
+  lrcPickName.textContent = file.name;
+  const content = await file.text();
+  textInput.value = content;
+  applyTextInput(content);
+  lrcInput.value = '';
+});
+
+const playbackTimeEl = document.getElementById('playback-time')!;
+
+function formatClock(seconds: number): string {
+  const safe = Math.max(0, Math.floor(seconds));
+  const m = Math.floor(safe / 60);
+  const s = safe % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function updatePlaybackTimer(): void {
+  const current = engine.playbackTime;
+  const total = engine.timelineDuration;
+  playbackTimeEl.textContent = `${formatClock(current)} / ${formatClock(total)}`;
+  requestAnimationFrame(updatePlaybackTimer);
+}
+
+requestAnimationFrame(updatePlaybackTimer);
 
 // Segment duration
 const segSlider = document.getElementById('seg-slider') as HTMLInputElement;
@@ -521,8 +756,7 @@ audioToggle.addEventListener('click', () => {
   }
 });
 
-
-// BPM (used when no audio is loaded)
+// BPM
 const bpmSlider = document.getElementById('bpm-slider') as HTMLInputElement;
 const bpmVal = document.getElementById('bpm-val')!;
 bpmSlider.addEventListener('input', () => {
@@ -638,10 +872,11 @@ let recordedChunks: Blob[] = [];
 let recStartTime = 0;
 let recTimerInterval: ReturnType<typeof setInterval> | null = null;
 
-// PNG sequence capture for alpha mode
-let pngFrames: Blob[] = [];
+let pngFrameBuffer: Record<number, Blob> = {};
+let pngFrameIndex = 0;
 let pngCaptureRaf = 0;
 let pngRecording = false;
+let pngLastCaptureTime = 0;
 const PNG_FPS = 30;
 
 function formatTime(ms: number): string {
@@ -653,21 +888,31 @@ function formatTime(ms: number): string {
 
 function capturePngFrame(canvas: HTMLCanvasElement) {
   if (!pngRecording) return;
-  canvas.toBlob((blob) => {
-    if (blob && pngRecording) pngFrames.push(blob);
-  }, 'image/png');
-  setTimeout(() => capturePngFrame(canvas), 1000 / PNG_FPS);
+  const now = performance.now();
+  const interval = 1000 / PNG_FPS;
+  if (now - pngLastCaptureTime >= interval) {
+    pngLastCaptureTime = now;
+    const idx = pngFrameIndex++;
+    canvas.toBlob((blob) => {
+      if (blob) pngFrameBuffer[idx] = blob;
+    }, 'image/png');
+  }
+  pngCaptureRaf = requestAnimationFrame(() => capturePngFrame(canvas));
 }
 
 async function finishPngExport(slug: string) {
   recLabel.textContent = t('packing');
+  await new Promise(r => setTimeout(r, 200));
   const JSZip = (await import('jszip')).default;
   const zip = new JSZip();
   const folder = zip.folder('frames')!;
-  for (let i = 0; i < pngFrames.length; i++) {
-    folder.file(`frame_${String(i).padStart(5, '0')}.png`, pngFrames[i]);
+  const totalFrames = pngFrameIndex;
+  for (let i = 0; i < totalFrames; i++) {
+    if (pngFrameBuffer[i]) {
+      folder.file(`frame_${String(i).padStart(5, '0')}.png`, pngFrameBuffer[i]);
+    }
   }
-  zip.file('.pv', JSON.stringify({ v: '0914', t: Date.now(), fps: PNG_FPS, f: pngFrames.length }));
+  zip.file('.pv', JSON.stringify({ v: '0914', t: Date.now(), fps: PNG_FPS, f: totalFrames }));
   const content = await zip.generateAsync({ type: 'blob' });
   const url = URL.createObjectURL(content);
   const a = document.createElement('a');
@@ -675,7 +920,8 @@ async function finishPngExport(slug: string) {
   a.download = `pv-${slug}-${PNG_FPS}fps-${Date.now()}.zip`;
   a.click();
   URL.revokeObjectURL(url);
-  pngFrames = [];
+  pngFrameBuffer = {};
+  pngFrameIndex = 0;
   recLabel.textContent = t('rec');
 }
 
@@ -683,17 +929,18 @@ recBtn.addEventListener('click', () => {
   const useAlpha = engine.alphaMode;
   const slug = getTemplateSlug();
 
-  // --- Alpha mode: PNG sequence capture ---
   if (useAlpha) {
     if (pngRecording) {
       pngRecording = false;
+      cancelAnimationFrame(pngCaptureRaf);
       if (recTimerInterval) { clearInterval(recTimerInterval); recTimerInterval = null; }
       recBtn.classList.remove('recording');
       finishPngExport(slug);
       return;
     }
-
-    pngFrames = [];
+    pngFrameBuffer = {};
+    pngFrameIndex = 0;
+    pngLastCaptureTime = 0;
     pngRecording = true;
     recStartTime = performance.now();
     recBtn.classList.add('recording');
@@ -705,7 +952,6 @@ recBtn.addEventListener('click', () => {
     return;
   }
 
-  // --- Normal mode: MediaRecorder ---
   if (mediaRecorder && mediaRecorder.state === 'recording') {
     mediaRecorder.stop();
     return;
@@ -742,7 +988,6 @@ recBtn.addEventListener('click', () => {
     recBtn.classList.remove('recording');
     recLabel.textContent = t('rec');
     recTimer.textContent = '';
-
     if (recordedChunks.length === 0) return;
     const blob = new Blob(recordedChunks, { type: mimeType });
     const url = URL.createObjectURL(blob);
@@ -764,11 +1009,12 @@ recBtn.addEventListener('click', () => {
 
 // ══════════════════════════════════════════════════════════
 //  OBS 透明输出模式  (?obs=1)
-//  本地运行: npm run dev
-//  OBS 浏览器源 URL: http://localhost:5173/?obs=1
+//  OBS 浏览器源 URL: https://mamayu1.github.io/pv-tool/?obs=1
+//  可选参数: &t=模板编号  &offset=歌词偏移ms(默认200)
 // ══════════════════════════════════════════════════════════
 
 if (new URLSearchParams(window.location.search).get('obs') === '1') {
+
   // 隐藏面板
   (document.getElementById('panels-wrapper') as HTMLElement).style.display = 'none';
   (document.getElementById('mobile-toggle') as HTMLElement).style.display = 'none';
@@ -784,7 +1030,9 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
     }
   });
 
-  
+  // 歌词偏移参数
+  const OFFSET_MS = parseInt(new URLSearchParams(window.location.search).get('offset') ?? '200');
+
   // ── Now Playing 歌词同步 ──
   const NP_BASE       = 'http://localhost:9863';
   const LYRIC_REFRESH = 5000;
@@ -817,10 +1065,10 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
   }
 
   function injectLyric(text: string) {
-  if (!text || text === lastLine) return;
-  lastLine = text;
-  engine.setTextLive(text + '/' + text);
-}
+    if (!text || text === lastLine) return;
+    lastLine = text;
+    engine.setTextLive(text + '/' + text);
+  }
 
   async function refreshLyric() {
     try {
@@ -835,7 +1083,6 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
     } catch (_) {}
   }
 
-  const OFFSET_MS = parseInt(new URLSearchParams(window.location.search).get('offset') ?? '200');
   async function pollPosition() {
     if (!lrcLines.length) return;
     try {
@@ -845,7 +1092,6 @@ if (new URLSearchParams(window.location.search).get('obs') === '1') {
     } catch (_) {}
   }
 
-  // Worker 计时防主线程节流
   const worker = new Worker(URL.createObjectURL(new Blob([`
     setInterval(() => postMessage('lyric'), ${LYRIC_REFRESH});
     setInterval(() => postMessage('pos'),   ${POSITION_POLL});
