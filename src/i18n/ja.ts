@@ -1,6 +1,9 @@
 import type { LocaleKey } from './zh';
 
 export const ja: Record<LocaleKey, string> = {
+  // Page
+  'page_title': 'PV Tool - PVビジュアルジェネレーター',
+
   // Panel titles
   'postfx': 'ポスト Post FX',
   'effects_library': 'エフェクト Effects',
@@ -80,17 +83,30 @@ export const ja: Record<LocaleKey, string> = {
   'tpl_spiderWeb': 'スパイダーウェブ',
   'tpl_staggeredText': 'スタッガードテキスト',
   'tpl_calmVillain': 'クールヴィラン',
+  'tpl_girlyClouds': 'ピンククラウド',
+  'tpl_sweetPink': 'グリッドスカラップ',
+  'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
 
   // File picker
   'choose_file': 'ファイル選択',
   'no_file': '未選択',
 
-  // Sharecode
-  'export_code': '設定コード出力',
-  'import_code': '設定コード入力',
+  // Sharecode & template management
+  'export_code': 'シェアコード出力',
+  'import_code': 'シェアコード入力',
   'import_btn': '読込',
   'code_copied': 'コピー済',
   'code_invalid': 'コード無効',
+  'save_tpl': '保存',
+  'delete_tpl': '削除',
+  'confirm': '確認',
+  'cancel': 'キャンセル',
+  'tpl_name_placeholder': 'テンプレート名を入力...',
+  'confirm_delete': '削除確認',
+  'share_code': 'シェアコード Share Code',
+  'copy': 'コピー',
+  'paste_code': 'シェアコードを貼り付け...',
+
 
   // Effect categories
   'ecat_背景': '背景',
@@ -120,6 +136,8 @@ export const ja: Record<LocaleKey, string> = {
   'fx_centeredSquares': 'センタースクエア Squares',
   'fx_balancingCircles': 'バランス円 Circles',
   'fx_radialRectangles': '放射矩形 RadialRect',
+  'fx_starTrail': '星軌 StarTrail',
+  'fx_planet': '惑星 Planet',
   'fx_flowingLines': 'フローライン Lines',
   'fx_diagonalFill': '斜線フィル Diagonal',
   'fx_diagonalHatch': '斜線ハッチ Hatch',
@@ -137,6 +155,7 @@ export const ja: Record<LocaleKey, string> = {
   'fx_textStrip': 'テキストストリップ Strip',
   'fx_textCards': 'テキストカード Cards',
   'fx_bigOutlineText': '大文字アウトライン BigText',
+  'fx_cuteOutlineText': 'キュートアウトライン CuteText',
   'fx_layeredText': 'レイヤードテキスト Layered',
   'fx_glowTextCards': 'グローカード GlowCards',
   'fx_verticalSubText': '縦書きサブ VertSub',
@@ -168,4 +187,7 @@ export const ja: Record<LocaleKey, string> = {
   'fx_jigsawGrid': 'ジグソーグリッド Jigsaw',
   'fx_edgeClouds': 'エッジクラウド EdgeClouds',
   'fx_pinkStripes': 'ピンクストライプ PinkStripes',
+  'fx_pinkGrid': 'ピンクグリッド PinkGrid',
+  'fx_scalloppedBorder': 'スカラップボーダー Scallop',
+  'fx_pulsingCircle': 'パルスサークル Pulse',
 };
