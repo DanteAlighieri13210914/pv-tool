@@ -86,6 +86,7 @@ export const zh = {
   'tpl_girlyClouds': '少女云朵',
   'tpl_sweetPink': '格子花边',
   'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
+  'tpl_kawaiPixel': 'Kawaii像素',
 
   // File picker
   'choose_file': '选择文件',
@@ -119,6 +120,7 @@ export const zh = {
   'ecat_数字废墟': '数字废墟',
   'ecat_特殊形状': '特殊形状',
   'ecat_云朵条纹': '云朵条纹',
+  'ecat_Kawaii像素': 'Kawaii像素',
 
   // Effect labels (used in custom panel)
   'fx_textureBackground': '纹理背景 Texture BG',
@@ -190,6 +192,10 @@ export const zh = {
   'fx_pinkGrid': '粉色格子 PinkGrid',
   'fx_scalloppedBorder': '上下花边 Scallop',
   'fx_pulsingCircle': '跃动圆形 Pulse',
+  'fx_pixelWindow': '像素窗口 PixelWin',
+  'fx_desktopIcon': '桌面图标 Icon',
+  'fx_pixelBackground': '像素背景 PixelBG',
+  'fx_pixelTypewriter': '像素打字机 PixelType',
 } as const;
 
 export type LocaleKey = keyof typeof zh;

@@ -88,6 +88,7 @@ export const en: Record<LocaleKey, string> = {
   'tpl_girlyClouds': 'Pink Cloud',
   'tpl_sweetPink': 'Sweet Pink',
   'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
+  'tpl_kawaiPixel': 'Kawaii Pixel',
 
   // File picker
   'choose_file': 'Choose File',
@@ -120,6 +121,7 @@ export const en: Record<LocaleKey, string> = {
   'ecat_数字废墟': 'Digital Grunge',
   'ecat_特殊形状': 'Special Shapes',
   'ecat_云朵条纹': 'Clouds & Stripes',
+  'ecat_Kawaii像素': 'Kawaii Pixel',
 
   // Effect labels
   'fx_textureBackground': 'Texture BG',
@@ -191,4 +193,8 @@ export const en: Record<LocaleKey, string> = {
   'fx_pulsingCircle': 'Pulsing Circle',
   'fx_starTrail': 'Star Trail',
   'fx_planet': 'Planet',
+  'fx_pixelWindow': 'Pixel Window',
+  'fx_desktopIcon': 'Desktop Icon',
+  'fx_pixelBackground': 'Pixel Background',
+  'fx_pixelTypewriter': 'Pixel Typewriter',
 };

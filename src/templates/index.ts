@@ -17,6 +17,7 @@ import { calmVillainTemplate } from './calmVillain';
 import { girlyCloudTemplate } from './girlyClouds';
 import { sweetPinkTemplate } from './sweetPink';
 import { flyMeToTheMoonTemplate } from './flyMeToTheMoon';
+import { kawaiPixelTemplate } from './kawaiPixel';
 
 export const templates: TemplateConfig[] = [
   blueBoldTemplate,          // 0  蓝色冲击
@@ -34,6 +35,7 @@ export const templates: TemplateConfig[] = [
   girlyCloudTemplate,        // 12 少女云朵
   sweetPinkTemplate,         // 13 格子花边
   flyMeToTheMoonTemplate,    // 14 Fly Me to the Moon
+  kawaiPixelTemplate,        // 15 Kawaii像素
 ];
 
 export function getTemplate(name: string): TemplateConfig | undefined {
