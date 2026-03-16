@@ -287,15 +287,15 @@ app.innerHTML = `
         </div>
         <div id="effect-grid">
         ${(() => {
-  function fxKey(e: typeof effectCatalog[0]): string {
-    if (e.type === 'organicBlob') return 'fx_organicBlob_' + (e.config.shape ?? 'blob');
-    return 'fx_' + e.type;
-  }
-  const cats: Record<string, { idx: number; key: string; fallback: string }[]> = {};
-  effectCatalog.forEach((e, i) => {
-    (cats[e.category] ??= []).push({ idx: i, key: fxKey(e), fallback: e.label });
-  });
-  return Object.entries(cats).map(([cat, items]) => `
+          function fxKey(e: typeof effectCatalog[0]): string {
+            if (e.type === 'organicBlob') return 'fx_organicBlob_' + (e.config.shape ?? 'blob');
+            return 'fx_' + e.type;
+          }
+          const cats: Record<string, { idx: number; key: string; fallback: string }[]> = {};
+          effectCatalog.forEach((e, i) => {
+            (cats[e.category] ??= []).push({ idx: i, key: fxKey(e), fallback: e.label });
+          });
+          return Object.entries(cats).map(([cat, items]) => `
             <details class="effect-category" open>
               <summary class="effect-category-title">${t(('ecat_' + cat) as any) || cat}</summary>
               <div class="effect-grid">
@@ -308,7 +308,7 @@ app.innerHTML = `
               </div>
             </details>
           `).join('');
-})()}
+        })()}
       </div>
       </details>
     </div>

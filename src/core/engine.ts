@@ -347,14 +347,14 @@ export class PVEngine {
     while (
       this.lyricCursor + 1 < this.lyricTimeline.length
       && this.lyricTimeline[this.lyricCursor + 1].time <= t
-      ) {
+    ) {
       this.lyricCursor++;
     }
 
     while (
       this.lyricCursor > 0
       && this.lyricTimeline[this.lyricCursor].time > t
-      ) {
+    ) {
       this.lyricCursor--;
     }
 
