@@ -72,6 +72,10 @@ import { JigsawGrid } from './jigsawGrid';
 import { PaperTear } from './paperTear';
 import { StarTrail } from './starTrail';
 import { Planet } from './planet';
+import { PixelWindow } from './pixelWindow';
+import { DesktopIcon } from './desktopIcon';
+import { PixelBackground } from './pixelBackground';
+import { PixelTypewriter } from './pixelTypewriter';
 
 type EffectConstructor = new () => BaseEffect;
 
@@ -148,6 +152,10 @@ register('jigsawGrid', JigsawGrid);
 register('paperTear', PaperTear);
 register('starTrail', StarTrail);
 register('planet', Planet);
+register('pixelWindow', PixelWindow);
+register('desktopIcon', DesktopIcon);
+register('pixelBackground', PixelBackground);
+register('pixelTypewriter', PixelTypewriter);
 
 export function createEffect(
   type: string,
