@@ -4,7 +4,6 @@
 import * as PIXI from 'pixi.js';
 import { BaseEffect } from './base';
 import type { UpdateContext } from '../core/types';
-import type { HeartVoiceConfig } from '../types/heartVoice';
 import initJieba, { cut as jiebaCut } from 'jieba-wasm';
 
 // Jieba WASM 初始化状态
@@ -58,13 +57,6 @@ function canMergeWithPrevWord(kana: string): boolean {
   return JAPANESE_PARTICLES.has(kana) || NOUN_SUFFIXES.has(kana);
 }
 
-// 预分词字典 - 构建时生成或手动添加
-// 格式: { "原文本": ["分词", "结果"] }
-const PRE_SEGMENTED_DICT: Record<string, string[]> = {
-  "今天天气很好": ["今天", "天气", "很好"],
-  "我爱学习编程": ["我", "爱", "学习", "编程"],
-  "日本語を勉強しています": ["日本語", "を", "勉強", "し", "て", "います"],
-};
 
 interface WordItem {
   word: string;
@@ -90,47 +82,26 @@ export class HeartVoice extends BaseEffect {
   private segmentText(text: string): string[] {
     let words: string[];
     
-    // 1. 先尝试预分词字典
-    const preSegmented = PRE_SEGMENTED_DICT[text];
-    if (preSegmented) {
-      words = preSegmented;
-    } else {
-      // 2. 检查配置中的预分词字典
-      const config = this.config as HeartVoiceConfig;
-      if (config.preDict && config.preDict[text]) {
-        words = config.preDict[text];
-      } else {
-        // 3. 使用 Jieba WASM 分词（如果已初始化）
-        if (jiebaInitialized) {
-          try {
-            const result = jiebaCut(text, true); // 启用 HMM 模式
-            if (result && result.length > 0) {
-              words = result;
-            } else {
-              words = this.fallbackSegment(text, config.fallbackSegmenter);
-            }
-          } catch (err) {
-            console.warn('[HeartVoice] Jieba 分词失败:', err);
-            words = this.fallbackSegment(text, config.fallbackSegmenter);
-          }
+    if (jiebaInitialized) {
+      try {
+        const result = jiebaCut(text, true);
+        if (result && result.length > 0) {
+          words = result;
         } else {
-          words = this.fallbackSegment(text, config?.fallbackSegmenter);
+          words = text.split('');
         }
+      } catch (err) {
+        console.warn('[HeartVoice] Jieba 分词失败:', err);
+        words = text.split('');
       }
+    } else {
+      words = text.split('');
     }
     
     // Post-process: merge Japanese kana segments (jieba splits kana into single chars)
     words = this.mergeKanaSegments(words);
     // Post-process: merge punctuation-only words into previous word
     return this.mergePunctuationWords(words);
-  }
-  
-  private fallbackSegment(text: string, mode?: 'char' | 'whitespace'): string[] {
-    if (mode === 'whitespace') {
-      return text.split(/\s+/).filter(w => w.length > 0);
-    }
-    // 默认: 按字符分词
-    return text.split('');
   }
   
   private mergePunctuationWords(words: string[]): string[] {
@@ -440,12 +411,13 @@ private async splitWordsBySlash(text: string): Promise<string[][]> {
     
     // Calculate positions
     const baseFontSize = this.config.fontSize ?? 80;
+    const style2Scale = this.config.style2Scale ?? 1.4;
     const style1Size = baseFontSize;
-    const style2Size = baseFontSize * 1.4;
+    const style2Size = baseFontSize * style2Scale;
     const padding = baseFontSize * 0.15;
     
-    const style1Color = '#000000';
-    const style2Color = '#ffffff';
+    const style1Color = this.config.style1Color ?? '#000000';
+    const style2Color = this.config.style2Color ?? '#ffffff';
     
     // Group by rows first
     const rows: { [key: number]: typeof allWordItems } = {};
@@ -472,7 +444,7 @@ private async splitWordsBySlash(text: string): Promise<string[][]> {
     const widthScale = maxRowWidth > maxWidth ? maxWidth / maxRowWidth : 1;
     const finalFontSize = baseFontSize * widthScale;
     const finalStyle1Size = finalFontSize;
-    const finalStyle2Size = finalFontSize * 1.4;
+    const finalStyle2Size = finalFontSize * style2Scale;
     
     // Calculate row height with final size
     const rowHeight = finalStyle2Size * 1.1;
@@ -516,7 +488,7 @@ private async splitWordsBySlash(text: string): Promise<string[][]> {
       let filters: PIXI.Filter[] = [];
       if (!isStyle1) {
         const blur = new PIXI.BlurFilter();
-        blur.blur = 4;
+        blur.blur = this.config.blur ?? 4;
         filters = [blur];
       }
       
