@@ -76,6 +76,7 @@ import { PixelWindow } from './pixelWindow';
 import { DesktopIcon } from './desktopIcon';
 import { PixelBackground } from './pixelBackground';
 import { PixelTypewriter } from './pixelTypewriter';
+import { HeartVoice } from './heartVoice';
 
 type EffectConstructor = new () => BaseEffect;
 
@@ -156,6 +157,7 @@ register('pixelWindow', PixelWindow);
 register('desktopIcon', DesktopIcon);
 register('pixelBackground', PixelBackground);
 register('pixelTypewriter', PixelTypewriter);
+register('heartVoice', HeartVoice);
 
 export function createEffect(
   type: string,
