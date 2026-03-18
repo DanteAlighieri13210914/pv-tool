@@ -2,14 +2,7 @@
 // Licensed under AGPL-3.0. For commercial use, see COMMERCIAL.md
 
 import { t } from '../i18n';
-
-function showToast(msg: string) {
-  const el = document.createElement('div');
-  el.className = 'pv-toast';
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2200);
-}
+import { showToast, attachModalDismiss } from './uiHelpers';
 
 export function initCopyUrlButton(
   copyUrlBtn: HTMLButtonElement,
@@ -57,15 +50,6 @@ export function initCopyUrlButton(
       showToast(t('url_copied'));
     });
 
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) overlay.remove();
-    });
-    const onEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        overlay.remove();
-        document.removeEventListener('keydown', onEsc);
-      }
-    };
-    document.addEventListener('keydown', onEsc);
+    attachModalDismiss(overlay);
   });
 }
