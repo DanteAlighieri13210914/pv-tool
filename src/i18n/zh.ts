@@ -172,6 +172,7 @@ export const zh = {
   'fx_formulaText': '公式文字 Formula',
   'fx_fallingText': '文字雨 Falling',
   'fx_staggeredText': '错落文字 Staggered',
+  'fx_heartVoice': '心声 HeartVoice',
   'fx_colorMask': '颜色蒙版 Mask',
   'fx_chromaticAberration': '色差 Chromatic',
   'fx_glitchBars': '故障条 Glitch',

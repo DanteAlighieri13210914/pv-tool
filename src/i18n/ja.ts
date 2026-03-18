@@ -174,6 +174,7 @@ export const ja: Record<LocaleKey, string> = {
   'fx_formulaText': '数式テキスト Formula',
   'fx_fallingText': 'テキストレイン Falling',
   'fx_staggeredText': 'スタッガードテキスト Staggered',
+  'fx_heartVoice': '心声 HeartVoice',
   'fx_colorMask': 'カラーマスク Mask',
   'fx_chromaticAberration': '色収差 Chromatic',
   'fx_glitchBars': 'グリッチバー Glitch',

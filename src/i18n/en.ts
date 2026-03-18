@@ -171,6 +171,7 @@ export const en: Record<LocaleKey, string> = {
   'fx_formulaText': 'Formula Text',
   'fx_fallingText': 'Falling Text',
   'fx_staggeredText': 'Staggered Text',
+  'fx_heartVoice': 'Heart Voice',
   'fx_colorMask': 'Color Mask',
   'fx_chromaticAberration': 'Chromatic Aberration',
   'fx_glitchBars': 'Glitch Bars',

@@ -6,4 +6,13 @@ export default defineConfig({
   plugins: [
     FullReload(['src/**/*']),
   ],
+  server: {
+    allowedHosts: true,
+    mimeTypes: {
+      '.wasm': 'application/wasm',
+    },
+  },
+  optimizeDeps: {
+    exclude: ['jieba-wasm'],
+  },
 });
