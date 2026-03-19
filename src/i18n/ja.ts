@@ -97,6 +97,7 @@ export const ja: Record<LocaleKey, string> = {
   'tpl_sweetPink': 'グリッドスカラップ',
   'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
   'tpl_kawaiPixel': 'Kawaiiピクセル',
+  'tpl_crimeScene': '犯罪現場',
 
   // File picker
   'choose_file': 'ファイル選択',
@@ -206,6 +207,8 @@ export const ja: Record<LocaleKey, string> = {
   'fx_desktopIcon': 'デスクトップアイコン Icon',
   'fx_pixelBackground': 'ピクセル背景 PixelBG',
   'fx_pixelTypewriter': 'ピクセルタイプライター PixelType',
+  'fx_crimeTape': '封鎖テープ CrimeTape',
+  'fx_bloodSplatter': '血痕 Blood',
 
   // Hint messages
   'hint_press': '押す',

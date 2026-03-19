@@ -76,6 +76,8 @@ import { PixelWindow } from './pixelWindow';
 import { DesktopIcon } from './desktopIcon';
 import { PixelBackground } from './pixelBackground';
 import { PixelTypewriter } from './pixelTypewriter';
+import { CrimeTape } from './crimeTape';
+import { BloodSplatter } from './bloodSplatter';
 
 type EffectConstructor = new () => BaseEffect;
 
@@ -156,6 +158,8 @@ register('pixelWindow', PixelWindow);
 register('desktopIcon', DesktopIcon);
 register('pixelBackground', PixelBackground);
 register('pixelTypewriter', PixelTypewriter);
+register('crimeTape', CrimeTape);
+register('bloodSplatter', BloodSplatter);
 
 export function createEffect(
   type: string,

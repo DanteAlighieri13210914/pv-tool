@@ -95,6 +95,7 @@ export const zh = {
   'tpl_sweetPink': '格子花边',
   'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
   'tpl_kawaiPixel': 'Kawaii像素',
+  'tpl_crimeScene': '案发现场',
 
   // File picker
   'choose_file': '选择文件',
@@ -204,6 +205,8 @@ export const zh = {
   'fx_desktopIcon': '桌面图标 Icon',
   'fx_pixelBackground': '像素背景 PixelBG',
   'fx_pixelTypewriter': '像素打字机 PixelType',
+  'fx_crimeTape': '封条 CrimeTape',
+  'fx_bloodSplatter': '血迹 Blood',
 
   // Hint messages
   'hint_press': '按',
