@@ -78,6 +78,7 @@ import { PixelBackground } from './pixelBackground';
 import { PixelTypewriter } from './pixelTypewriter';
 import { CrimeTape } from './crimeTape';
 import { BloodSplatter } from './bloodSplatter';
+import { VictimOutline } from './victimOutline';
 
 type EffectConstructor = new () => BaseEffect;
 
@@ -160,6 +161,7 @@ register('pixelBackground', PixelBackground);
 register('pixelTypewriter', PixelTypewriter);
 register('crimeTape', CrimeTape);
 register('bloodSplatter', BloodSplatter);
+register('victimOutline', VictimOutline);
 
 export function createEffect(
   type: string,

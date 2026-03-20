@@ -208,6 +208,7 @@ export const en: Record<LocaleKey, string> = {
   'fx_pixelTypewriter': 'Pixel Typewriter',
   'fx_crimeTape': 'Crime Tape',
   'fx_bloodSplatter': 'Blood Splatter',
+  'fx_victimOutline': 'Victim Outline',
 
   // Hint messages
   'hint_press': 'Press',

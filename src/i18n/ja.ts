@@ -209,6 +209,7 @@ export const ja: Record<LocaleKey, string> = {
   'fx_pixelTypewriter': 'ピクセルタイプライター PixelType',
   'fx_crimeTape': '封鎖テープ CrimeTape',
   'fx_bloodSplatter': '血痕 Blood',
+  'fx_victimOutline': '被害者アウトライン VictimOutline',
 
   // Hint messages
   'hint_press': '押す',

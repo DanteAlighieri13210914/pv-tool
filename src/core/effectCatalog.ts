@@ -93,6 +93,7 @@ export const effectCatalog: EffectPreset[] = [
   // 特殊形状 Special Shape
   { type: 'crimeTape', label: '封条 CrimeTape', category: '特殊形状', layer: 'decoration', config: { count: 5, tapeColor: '#f5c800', textColor: '#000000', tapeWidth: 52, speed: 80, text: 'POLICE LINE DO NOT CROSS', angleRange: 0.18 } },
   { type: 'bloodSplatter', label: '血迹 Blood', category: '特殊形状', layer: 'background', config: { count: 4, color: '#8b0000', alpha: 0.92, size: 1.0, seed: 42 } },
+  { type: 'victimOutline', label: '受害者轮廓 VictimOutline', category: '特殊形状', layer: 'decoration', config: { color: '#ffffff', alpha: 0.88, scale: 1.5, lineWidth: 5, seed: 0 } },
   { type: 'paperTear', label: '撕裂纸张 PaperTear', category: '特殊形状', layer: 'overlay', config: { seed: 914, borderWidth: 7 } },
   { type: 'jigsawGrid', label: '拼图网格 Jigsaw', category: '特殊形状', layer: 'decoration', config: { cols: 8, rows: 5, color: '$line', alpha: 0.5, lineWidth: 2 } },
 

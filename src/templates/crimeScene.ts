@@ -16,6 +16,17 @@ export const crimeSceneTemplate: TemplateConfig = {
   animationSpeed: 2.5,
   effects: [
     {
+      type: 'victimOutline',
+      layer: 'background',
+      config: {
+        color: '#ffffff',
+        alpha: 0.88,
+        scale: 1.5,
+        lineWidth: 5,
+        seed: 914,
+      },
+    },
+    {
       type: 'bloodSplatter',
       layer: 'background',
       config: {

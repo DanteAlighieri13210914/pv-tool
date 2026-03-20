@@ -207,6 +207,7 @@ export const zh = {
   'fx_pixelTypewriter': '像素打字机 PixelType',
   'fx_crimeTape': '封条 CrimeTape',
   'fx_bloodSplatter': '血迹 Blood',
+  'fx_victimOutline': '受害者轮廓 VictimOutline',
 
   // Hint messages
   'hint_press': '按',
