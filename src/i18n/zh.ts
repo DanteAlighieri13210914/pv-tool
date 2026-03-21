@@ -30,6 +30,8 @@ export const zh = {
   'paused': '⏹ Paused',
   'bpm': 'BPM',
   'beat_react': '节拍反应 Beat React',
+  'preview_fps': '限制预览帧率',
+  'fps_unlimited': '无限制 Unlimited',
 
   // Right panel — Post FX
   'shake': '抖动 Shake',
