@@ -72,6 +72,7 @@ export class PVEngine {
   private _resizeParent: HTMLElement | null = null;
   private _loading = false;
   private _bgColorOverride: string | null = null;
+  private _fontFamilyOverride: string | null = null;
   private _tick = 0;
   private _playbackTime = 0;
   private _paused = false;
@@ -220,6 +221,15 @@ export class PVEngine {
         const config = { ...entry.config };
         if (this.userText) {
           config._userText = this.textSegments[0] || this.userText;
+        }
+
+        if (this._fontFamilyOverride) {
+          if (config.fontFamily) {
+            config.fontFamily = `${this._fontFamilyOverride}, ${config.fontFamily}`;
+          } else {
+            // Provide a sensible fallback if the template effect didn't have one
+            config.fontFamily = `${this._fontFamilyOverride}, "Noto Serif JP", "Yu Mincho", serif`;
+          }
         }
 
         try {
@@ -558,6 +568,14 @@ export class PVEngine {
     }
   }
   get canvasColor() { return this._bgColorOverride; }
+
+  set fontFamily(font: string | null) {
+    this._fontFamilyOverride = font;
+    if (this.currentTemplate) {
+      this.loadTemplate(this.currentTemplate);
+    }
+  }
+  get fontFamily() { return this._fontFamilyOverride; }
 
   set hueShift(degrees: number) {
     this._hueShift = degrees;

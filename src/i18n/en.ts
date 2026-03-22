@@ -12,6 +12,8 @@ export const en: Record<LocaleKey, string> = {
   'template': 'Template',
   'custom': '✦ Custom',
   'canvas_color': 'Canvas Color',
+  'font_label': 'Font',
+  'load_local_fonts': 'Load Local Fonts',
   'follow_template': 'Follow Template',
   'text_label': 'Text (split with /)',
   'expand': 'Expand',

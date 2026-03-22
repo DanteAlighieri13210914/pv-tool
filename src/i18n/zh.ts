@@ -10,6 +10,8 @@ export const zh = {
   'template': '模板 Template',
   'custom': '✦ Custom 自定义',
   'canvas_color': '画布色 Canvas',
+  'font_label': '字体 Font',
+  'load_local_fonts': '获取本机字体',
   'follow_template': '跟随模板',
   'text_label': '文字 Text（用 / 分段）',
   'expand': '展开',

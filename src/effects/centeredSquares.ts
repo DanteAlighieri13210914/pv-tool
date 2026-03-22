@@ -88,12 +88,13 @@ export class CenteredSquares extends BaseEffect {
     const spacing = chars.length > 1 ? totalSpread / (chars.length - 1) : 0;
     const startX = cx - totalSpread / 2;
     const fontSize = this.config.fontSize ?? 52;
+    const fontFamily = this.config.fontFamily ?? '"Noto Serif JP", serif';
 
     for (let i = 0; i < chars.length; i++) {
       const ct = new PIXI.Text({
         text: chars[i],
         style: {
-          fontFamily: '"Noto Serif JP", serif',
+          fontFamily,
           fontSize,
           fontWeight: '900' as PIXI.TextStyleFontWeight,
           fill: '#ffffff',
