@@ -12,6 +12,8 @@ export const ja: Record<LocaleKey, string> = {
   'template': 'テンプレート Template',
   'custom': '✦ カスタム Custom',
   'canvas_color': 'キャンバス色 Canvas',
+  'font_label': 'フォント Font',
+  'load_local_fonts': 'ローカルフォントを取得',
   'follow_template': 'テンプレに従う',
   'text_label': 'テキスト Text（/で分割）',
   'expand': '展開',

@@ -51,7 +51,7 @@ export class TextStrip extends BaseEffect {
 
     for (let i = 0; i < chars.length; i++) {
       const style = new PIXI.TextStyle({
-        fontFamily: '"Noto Serif JP", "Yu Mincho", serif',
+        fontFamily: this.config.fontFamily ?? '"Noto Serif JP", "Yu Mincho", serif',
         fontSize,
         fontWeight: 'bold',
         fill: textColor,

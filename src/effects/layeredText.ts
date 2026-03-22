@@ -90,7 +90,7 @@ export class LayeredText extends BaseEffect {
     const textObj = new PIXI.Text({
       text,
       style: {
-        fontFamily: '"Noto Serif JP", serif',
+        fontFamily: this.config.fontFamily ?? '"Noto Serif JP", serif',
         fontSize,
         fontWeight: '900' as PIXI.TextStyleFontWeight,
         fill: color,

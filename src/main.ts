@@ -86,6 +86,20 @@ app.innerHTML = `
       </div>
 
       <div class="control-group">
+        <label>${t('font_label')}</label>
+        <div style="display: flex; gap: 8px;">
+          <select id="font-select" style="flex: 1;">
+            <option value="">${t('follow_template')}</option>
+          </select>
+          <button class="btn btn-sm" id="btn-load-fonts" title="${t('load_local_fonts')}" style="padding: 0 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18"/><path d="M7 16V9a2 2 0 0 1 2-2h1.4c1.1 0 2 .9 2 2v7"/><path d="M7 12h5.4"/><path d="M15 16v-3a2 2 0 0 1 2-2h1.4c1.1 0 2 .9 2 2v3"/><path d="M15 12h5.4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
         <label>${t('text_label')}</label>
         <textarea id="text-input" rows="1" placeholder="深夜東京/の6畳半夢">深夜東京/の6畳半夢/を見てた/灯りの灯らない蛍光灯/明日には消えてる電脳城/に/開幕戦/打ち上げて/いなくなんないよね/ここには誰もいない/ここには誰もいないから</textarea>
       </div>
@@ -415,6 +429,68 @@ swatchContainer.addEventListener('click', (e) => {
   const color = btn.dataset.color;
   engine.canvasColor = color || null;
 });
+
+// Font select
+const fontSelect = document.getElementById('font-select') as HTMLSelectElement;
+fontSelect.addEventListener('change', () => {
+  engine.fontFamily = fontSelect.value || null;
+});
+
+const btnLoadFonts = document.getElementById('btn-load-fonts') as HTMLButtonElement;
+
+async function loadLocalFonts(isUserClick = false) {
+  if (!('queryLocalFonts' in window)) {
+    if (isUserClick) {
+      alert('Your browser does not support the Local Font Access API.');
+    }
+    return;
+  }
+  try {
+    // @ts-ignore
+    const fonts = await window.queryLocalFonts();
+    const uniqueFamilies = new Set<string>();
+    for (const font of fonts) {
+      if (font.family) {
+        uniqueFamilies.add(font.family);
+      }
+    }
+    const currentVal = fontSelect.value;
+    const sorted = Array.from(uniqueFamilies).sort();
+    
+    let html = `<option value="">${t('follow_template')}</option>`;
+    for (const family of sorted) {
+      // LocalFontAccess API returns font variants, but for the web we just need the family name.
+      // E.g. "Segoe UI". We inject it directly into a standard CSS string.
+      const safeFamily = family.replace(/"/g, '&quot;');
+      const cssValue = `"${safeFamily}"`;
+      html += `<option value='${cssValue}'>${family}</option>`;
+    }
+    fontSelect.innerHTML = html;
+    
+    if (currentVal) {
+      fontSelect.value = currentVal;
+    }
+    if (fontSelect.value !== currentVal) {
+      fontSelect.value = '';
+      engine.fontFamily = null;
+    }
+    btnLoadFonts.style.opacity = '0.5';
+    btnLoadFonts.disabled = true;
+    btnLoadFonts.title = 'Fonts loaded';
+  } catch (err) {
+    console.error('Failed to load fonts:', err);
+    if (isUserClick) {
+      alert('Failed to load local fonts. Please ensure you granted permission.');
+    }
+  }
+}
+
+btnLoadFonts.addEventListener('click', () => {
+  loadLocalFonts(true);
+});
+
+// Try to auto-load on startup
+loadLocalFonts(false);
 
 // Template
 const templateSelect = document.getElementById('template-select') as HTMLSelectElement;
