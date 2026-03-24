@@ -17,6 +17,7 @@ import {
 import { testNowPlayingConnection } from './core/nowPlayingProvider';
 import { initCopyUrlButton } from './core/copyUrl';
 import { showToast, attachModalDismiss } from './core/uiHelpers';
+import { initTemplateButtons, rebuildTemplateButtons } from './core/templateButtons';
 
 console.log('%cPV Tool%c solaris:0914', 'color:#6688cc;font-weight:bold', 'color:#888');
 
@@ -354,6 +355,7 @@ engine.init(container).then(() => {
   syncOpacitySlider();
   syncPostfxSliders();
   updateTemplateButtons();
+  initTemplateButtons(templateSelect, () => customTemplates);
 
   // URL param: bg (transparent background)
   const bgParam = urlParams.get('bg');
@@ -538,6 +540,7 @@ function rebuildTemplateSelect() {
     `<option value="user-${i}">⭐ ${tp.name}</option>`
   ).join('');
   templateSelect.innerHTML = builtInHtml + customHtml + `<option value="custom">${t('custom')}</option>`;
+  rebuildTemplateButtons();
 }
 
 function updateTemplateButtons() {
@@ -548,6 +551,7 @@ function updateTemplateButtons() {
   // Hide inline inputs when switching
   tplSaveInput.style.display = 'none';
   tplDeleteConfirm.style.display = 'none';
+  rebuildTemplateButtons();
 }
 
 const tplSaveBtn = document.getElementById('tpl-save')!;
