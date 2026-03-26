@@ -32,6 +32,8 @@ export const ja: Record<LocaleKey, string> = {
   'paused': '⏹ 停止中',
   'bpm': 'BPM',
   'beat_react': 'ビート反応 Beat React',
+  'preview_fps': 'プレビューFPS制限',
+  'fps_unlimited': '無制限',
 
   // Right panel — Post FX
   'shake': 'シェイク Shake',

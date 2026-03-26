@@ -32,6 +32,8 @@ export const en: Record<LocaleKey, string> = {
   'paused': '⏹ Paused',
   'bpm': 'BPM',
   'beat_react': 'Beat React',
+  'preview_fps': 'Limit Preview FPS',
+  'fps_unlimited': 'Unlimited',
 
   // Right panel — Post FX
   'shake': 'Shake',

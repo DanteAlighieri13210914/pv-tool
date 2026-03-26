@@ -77,6 +77,10 @@ export class PVEngine {
   private _paused = false;
   private _time = 0;
   private _lastFrameTime = 0;
+  private _previewFps = 0;
+  private _fpsFrameCount = 0;
+  private _fpsLastTime = 0;
+  onFpsUpdate: ((fps: number) => void) | null = null;
 
   // Now Playing state
   private npProvider: NowPlayingProvider | null = null;
@@ -149,6 +153,14 @@ export class PVEngine {
         } else {
           this._time += dt;
         }
+      }
+
+      this._fpsFrameCount++;
+      if (now - this._fpsLastTime >= 1000) {
+        const fps = Math.round(this._fpsFrameCount * 1000 / (now - this._fpsLastTime));
+        if (this.onFpsUpdate) this.onFpsUpdate(fps);
+        this._fpsFrameCount = 0;
+        this._fpsLastTime = now;
       }
 
       this.update(this._time, ticker.deltaTime / 60);
@@ -538,6 +550,12 @@ export class PVEngine {
 
   set beatReactivity(val: number) { this._beatReactivity = val; }
   get beatReactivity() { return this._beatReactivity; }
+
+  setPreviewFps(fps: number) {
+    this._previewFps = fps;
+    this.app.ticker.maxFPS = fps > 0 ? fps : 0;
+  }
+  getPreviewFps() { return this._previewFps; }
 
   set canvasColor(color: string | null) {
     this._bgColorOverride = color;
