@@ -53,6 +53,9 @@ export interface MotionTargetInfo {
 export interface UpdateContext {
   time: number;
   deltaTime: number;
+  fps: number;
+  /** Seconds elapsed since the current text segment / lyric line started */
+  segmentTime: number;
   screenWidth: number;
   screenHeight: number;
   palette: ColorPalette;

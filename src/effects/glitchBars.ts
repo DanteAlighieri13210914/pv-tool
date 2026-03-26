@@ -14,6 +14,7 @@ interface GlitchBar {
   speed: number;
   lifetime: number;
   born: number;
+  startX: number;
 }
 
 export class GlitchBars extends BaseEffect {
@@ -55,6 +56,7 @@ export class GlitchBars extends BaseEffect {
         speed: (Math.random() - 0.5) * 200 * ctx.motionIntensity,
         lifetime: 0.08 + Math.random() * 0.2,
         born: ctx.time,
+        startX: x,
       });
     }
 
@@ -66,7 +68,7 @@ export class GlitchBars extends BaseEffect {
         bar.graphics.destroy();
         return false;
       }
-      bar.graphics.x += bar.speed * ctx.deltaTime;
+      bar.graphics.x = bar.startX + bar.speed * age;
       bar.graphics.alpha = 1 - (age / bar.lifetime);
       return true;
     });

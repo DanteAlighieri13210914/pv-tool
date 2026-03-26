@@ -17,7 +17,7 @@ import {
 import { testNowPlayingConnection } from './core/nowPlayingProvider';
 import { initCopyUrlButton } from './core/copyUrl';
 import { showToast, attachModalDismiss } from './core/uiHelpers';
-import { initTemplateButtons, rebuildTemplateButtons } from './core/templateButtons';
+import { initTemplateDropdown, rebuildTemplateDropdown } from './core/templateDropdown';
 
 console.log('%cPV Tool%c solaris:0914', 'color:#6688cc;font-weight:bold', 'color:#888');
 
@@ -155,7 +155,10 @@ app.innerHTML = `
       </div>
 
       <div class="control-group">
-        <label>${t('timer_label')} <span id="playback-time">00:00 / 00:00</span></label>
+        <div class="timeline-header">
+          <label>${t('timer_label')} <span id="playback-time">00:00 / 00:00</span></label>
+          <button class="btn btn-sm" id="timeline-pause-btn">⏸</button>
+        </div>
         <input type="range" id="seek-slider" min="0" max="1" step="0.001" value="0">
       </div>
 
@@ -355,7 +358,7 @@ engine.init(container).then(() => {
   syncOpacitySlider();
   syncPostfxSliders();
   updateTemplateButtons();
-  initTemplateButtons(templateSelect, () => customTemplates);
+  initTemplateDropdown(templateSelect, () => customTemplates);
 
   // URL param: bg (transparent background)
   const bgParam = urlParams.get('bg');
@@ -540,7 +543,7 @@ function rebuildTemplateSelect() {
     `<option value="user-${i}">⭐ ${tp.name}</option>`
   ).join('');
   templateSelect.innerHTML = builtInHtml + customHtml + `<option value="custom">${t('custom')}</option>`;
-  rebuildTemplateButtons();
+  rebuildTemplateDropdown();
 }
 
 function updateTemplateButtons() {
@@ -551,7 +554,7 @@ function updateTemplateButtons() {
   // Hide inline inputs when switching
   tplSaveInput.style.display = 'none';
   tplDeleteConfirm.style.display = 'none';
-  rebuildTemplateButtons();
+  rebuildTemplateDropdown();
 }
 
 const tplSaveBtn = document.getElementById('tpl-save')!;
@@ -782,6 +785,17 @@ function updatePlaybackTimer(): void {
 }
 
 requestAnimationFrame(updatePlaybackTimer);
+
+const timelinePauseBtn = document.getElementById('timeline-pause-btn')!;
+timelinePauseBtn.addEventListener('click', () => {
+  if (engine.paused) {
+    engine.resume();
+    timelinePauseBtn.textContent = '⏸';
+  } else {
+    engine.pause();
+    timelinePauseBtn.textContent = '▶';
+  }
+});
 
 // Segment duration
 const segSlider = document.getElementById('seg-slider') as HTMLInputElement;

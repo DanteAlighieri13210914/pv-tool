@@ -12,7 +12,6 @@ interface CharItem {
   targetY: number;
   delay: number;
   appeared: boolean;
-  animT: number;
 }
 
 export class BigOutlineText extends BaseEffect {
@@ -80,7 +79,6 @@ export class BigOutlineText extends BaseEffect {
         targetY: ty,
         delay: i * staggerDelay,
         appeared: false,
-        animT: 0,
       });
 
       this.container.addChild(t);
@@ -93,9 +91,7 @@ export class BigOutlineText extends BaseEffect {
     const spd = ctx.animationSpeed;
 
     for (const c of this.chars) {
-      c.animT += ctx.deltaTime * spd * 2.5;
-
-      const t = Math.max(0, c.animT - c.delay * spd);
+      const t = Math.max(0, ctx.segmentTime * spd * 2.5 - c.delay * spd);
 
       if (t <= 0) {
         c.text.alpha = 0;

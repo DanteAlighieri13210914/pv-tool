@@ -108,6 +108,7 @@ export class PVEngine {
       preserveDrawingBuffer: true,
     });
     parent.appendChild(this.app.canvas);
+    this.app.ticker.maxFPS = 60;
 
     // Media layer at the very bottom
     const mediaLayer = new PIXI.Container();
@@ -151,7 +152,7 @@ export class PVEngine {
         }
       }
 
-      this.update(this._time, ticker.deltaTime / 60);
+      this.update(this._time, this._paused ? 0 : ticker.deltaTime / 60);
     });
   }
 
@@ -354,6 +355,22 @@ export class PVEngine {
 
     if (t < this.lyricTimeline[0].time) return '';
     return this.lyricTimeline[this.lyricCursor].text;
+  }
+
+  /** Seconds elapsed since the start of the current text segment / lyric line.
+   *  Must be called after getDisplayText() so lyricCursor is up to date. */
+  private getSegmentTime(time: number): number {
+    if (this._srtTimeline) {
+      const ms = time * 1000;
+      const entry = this._srtTimeline.find(e => ms >= e.startMs && ms < e.endMs);
+      return entry ? time - entry.startMs / 1000 : 0;
+    }
+    if (!this.lyricTimeline || this.lyricTimeline.length === 0) {
+      return time % this._segmentDuration;
+    }
+    const t = Math.max(0, time + this.lyricOffsetSeconds);
+    if (t < this.lyricTimeline[0].time) return 0;
+    return t - this.lyricTimeline[this.lyricCursor].time;
   }
 
   set effectOpacity(val: number) {
@@ -847,12 +864,14 @@ export class PVEngine {
     const ctx: UpdateContext = {
       time,
       deltaTime,
+      fps: this.app.ticker.maxFPS,
       screenWidth: this.app.screen.width,
       screenHeight: this.app.screen.height,
       palette: this.palette,
       animationSpeed: this._animationSpeed,
       motionIntensity: this._motionIntensity,
       currentText: this.getDisplayText(lyricClock),
+      segmentTime: this.getSegmentTime(lyricClock),
       beatIntensity: this.beat.getIntensity(time) * this._beatReactivity,
       motionTargets: this.motionTargets,
     };
@@ -895,7 +914,7 @@ export class PVEngine {
 
     const beatShake = this.beat.getIntensity(time) * this._beatReactivity;
     const totalShake = this._shake + beatShake * 0.15;
-    if (totalShake > 0) {
+    if (totalShake > 0 && !this._paused) {
       px += (Math.random() - 0.5) * totalShake * 30;
       py += (Math.random() - 0.5) * totalShake * 20;
     }
