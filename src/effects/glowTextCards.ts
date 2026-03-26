@@ -23,7 +23,6 @@ export class GlowTextCards extends BaseEffect {
   readonly name = 'glowTextCards';
   private cards: CharCard[] = [];
   private currentText = '';
-  private appearTime = 0;
 
   protected setup(): void {}
 
@@ -34,7 +33,6 @@ export class GlowTextCards extends BaseEffect {
     }
     this.cards = [];
     this.currentText = text;
-    this.appearTime = ctx.time;
 
     if (!text || text.length === 0) return;
 
@@ -156,7 +154,7 @@ export class GlowTextCards extends BaseEffect {
 
     const speed = ctx.animationSpeed;
     for (const card of this.cards) {
-      const elapsed = (ctx.time - this.appearTime - card.delay) * speed;
+      const elapsed = (ctx.segmentTime - card.delay) * speed;
       if (elapsed < 0) {
         card.container.scale.set(0);
         card.container.alpha = 0;

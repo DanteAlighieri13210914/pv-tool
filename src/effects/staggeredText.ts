@@ -33,7 +33,6 @@ export class StaggeredText extends BaseEffect {
   private chars: PIXI.Text[] = [];
   private currentText = '';
   private currentMode: LayoutMode = 'diag-left';
-  private modeStartTime = 0;
   private modeIndex = 0;
 
   protected setup(): void {
@@ -168,17 +167,10 @@ export class StaggeredText extends BaseEffect {
     const fontFamily = this.config.fontFamily ?? '"Noto Serif JP", "Yu Mincho", serif';
     const transitionDuration = this.config.transition ?? 0.4;
 
-    // Cycle through modes
-    const elapsed = ctx.time - this.modeStartTime;
-    if (elapsed >= modeDuration || this.modeStartTime === 0) {
-      if (this.modeStartTime !== 0) {
-        this.modeIndex = (this.modeIndex + 1) % MODES.length;
-      }
-      this.currentMode = MODES[this.modeIndex];
-      this.modeStartTime = ctx.time;
-    }
-
-    const modeElapsed = ctx.time - this.modeStartTime;
+    // Cycle through modes based on segmentTime
+    this.modeIndex = Math.floor(ctx.segmentTime / modeDuration) % MODES.length;
+    this.currentMode = MODES[this.modeIndex];
+    const modeElapsed = ctx.segmentTime % modeDuration;
     const fadeIn = Math.min(1, modeElapsed / transitionDuration);
     const fadeOut = Math.min(1, (modeDuration - modeElapsed) / transitionDuration);
     const alpha = Math.min(fadeIn, fadeOut);

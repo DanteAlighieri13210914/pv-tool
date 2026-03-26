@@ -67,8 +67,14 @@ export class TextStrip extends BaseEffect {
     const newText = ctx.currentText ?? this.config.text ?? '';
 
     if (newText !== this.displayedText && this.fadeState === 'idle') {
-      this.pendingText = newText;
-      this.fadeState = 'fadeOut';
+      if (ctx.deltaTime === 0) {
+        this.buildText(newText);
+        this.fadeState = 'idle';
+        this.textAlpha = 1;
+      } else {
+        this.pendingText = newText;
+        this.fadeState = 'fadeOut';
+      }
     }
 
     const fadeSpeed = 4 * Math.max(ctx.animationSpeed, 0.5);

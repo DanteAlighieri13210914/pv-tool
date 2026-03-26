@@ -44,8 +44,14 @@ export class HeroText extends BaseEffect {
     const newText = ctx.currentText ?? this.config.text ?? '';
 
     if (newText !== this.displayedText && this.fadeState === 'idle') {
-      this.pendingText = newText;
-      this.fadeState = 'fadeOut';
+      if (ctx.deltaTime === 0) {
+        this.textObj.text = newText;
+        this.displayedText = newText;
+        this.textAlpha = 1;
+      } else {
+        this.pendingText = newText;
+        this.fadeState = 'fadeOut';
+      }
     }
 
     const fadeSpeed = 4 * Math.max(ctx.animationSpeed, 0.5);

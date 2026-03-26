@@ -77,7 +77,7 @@ export class ScatteredShapes extends BaseEffect {
       const spd = ctx.animationSpeed;
       p.graphics.x = p.baseX + Math.sin(ctx.time * 0.2 * spd + p.driftPhase) * 8 * drift;
       p.graphics.y = p.baseY + Math.cos(ctx.time * 0.15 * spd + p.driftPhase) * 6 * drift;
-      p.graphics.rotation += p.rotationSpeed * ctx.deltaTime * spd;
+      p.graphics.rotation = ctx.time * p.rotationSpeed * spd;
     }
   }
 }

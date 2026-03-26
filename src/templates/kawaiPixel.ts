@@ -5,6 +5,7 @@ import type { TemplateConfig } from '../core/types';
 
 export const kawaiPixelTemplate: TemplateConfig = {
   name: 'Kawaii像素',
+  nameKey: 'tpl_kawaiPixel',
   palette: {
     background: '#fef0f5',
     primary: '#ffb3d9',

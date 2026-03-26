@@ -12,8 +12,8 @@ interface TextBlock {
   lines: string[];
   fontSize: number;
   alpha: number;
-  lifetime: number;
-  age: number;
+  lifetime: number;  // frames
+  born: number;      // ctx.time at spawn
   hasBackground: boolean;
   inverted: boolean;
 }
@@ -36,8 +36,6 @@ export class NoiseText extends BaseEffect {
   override readonly heavy = true;
   private g!: PIXI.Graphics;
   private blocks: TextBlock[] = [];
-  private tick = 0;
-
   protected setup(): void {
     this.g = new PIXI.Graphics();
     this.container.addChild(this.g);
@@ -51,7 +49,7 @@ export class NoiseText extends BaseEffect {
     return s;
   }
 
-  private spawnBlock(w: number, h: number): TextBlock {
+  private spawnBlock(w: number, h: number, time: number): TextBlock {
     const lineCount = 1 + Math.floor(Math.random() * 5);
     const lines: string[] = [];
     const useSystem = Math.random() < 0.35;
@@ -72,14 +70,13 @@ export class NoiseText extends BaseEffect {
       fontSize: 10 + Math.floor(Math.random() * 14),
       alpha: 0.5 + Math.random() * 0.5,
       lifetime: 30 + Math.floor(Math.random() * 120),
-      age: 0,
+      born: time,
       hasBackground: Math.random() < 0.6,
       inverted: Math.random() < 0.3,
     };
   }
 
   update(ctx: UpdateContext): void {
-    this.tick++;
     const g = this.g;
     g.clear();
 
@@ -91,24 +88,24 @@ export class NoiseText extends BaseEffect {
 
     // Spawn new blocks to maintain count
     while (this.blocks.length < count) {
-      this.blocks.push(this.spawnBlock(w, h));
+      this.blocks.push(this.spawnBlock(w, h, ctx.time));
     }
 
     // Update and render
     for (let i = this.blocks.length - 1; i >= 0; i--) {
       const block = this.blocks[i];
-      block.age++;
+      const age = (ctx.time - block.born) * ctx.fps;  // frames elapsed
 
-      if (block.age > block.lifetime) {
-        this.blocks[i] = this.spawnBlock(w, h);
+      if (age > block.lifetime || age < 0) {
+        this.blocks[i] = this.spawnBlock(w, h, ctx.time);
         continue;
       }
 
       // Flicker: occasionally skip rendering
-      if (Math.random() < 0.08) continue;
+      if (ctx.deltaTime > 0 && Math.random() < 0.08) continue;
 
-      // Occasionally corrupt a character
-      if (this.tick % 5 === 0 && Math.random() < 0.3) {
+      // Occasionally corrupt a character (~every 5 frames)
+      if (Math.floor(age) % 5 === 0 && Math.random() < 0.3) {
         const lineIdx = Math.floor(Math.random() * block.lines.length);
         const line = block.lines[lineIdx];
         const charIdx = Math.floor(Math.random() * line.length);
@@ -118,8 +115,8 @@ export class NoiseText extends BaseEffect {
           line.substring(charIdx + 1);
       }
 
-      const fadeIn = Math.min(1, block.age / 5);
-      const fadeOut = Math.min(1, (block.lifetime - block.age) / 8);
+      const fadeIn = Math.min(1, age / 5);
+      const fadeOut = Math.min(1, (block.lifetime - age) / 8);
       const a = block.alpha * fadeIn * fadeOut;
 
       const textCol = block.inverted ? bgColor : color;
