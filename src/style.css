@@ -41,10 +41,12 @@ body {
   gap: 16px;
   backdrop-filter: blur(10px);
   min-width: 220px;
+  max-width: calc(100% - 268px);
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 0.85rem;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
 .collapsible-section {
@@ -519,16 +521,23 @@ input[type='range'] {
   .panels-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 10px;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+    bottom: 10px;
     z-index: 100;
     max-height: 55vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     transition: transform 0.25s ease;
+    scrollbar-width: none;
+  }
+
+  .panels-wrapper::-webkit-scrollbar {
+    width: 0 !important;
+    display: none;
   }
 
   .panels-wrapper.panels-hidden {
@@ -540,20 +549,16 @@ input[type='range'] {
   .controls-right {
     position: relative;
     top: auto;
-    left: auto;
+    left: 10px;
     right: auto;
     bottom: auto;
-    border-radius: 0;
     min-width: unset;
     width: 100%;
     max-height: none;
     overflow-y: visible;
     padding: 14px 16px;
     gap: 10px;
-  }
-
-  .panels-wrapper > .controls:first-child {
-    border-radius: 12px 12px 0 0;
+    max-width: calc(100% - 20px);
   }
 
   .controls-bottom {
