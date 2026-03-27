@@ -563,14 +563,10 @@ input[type='range'] {
 
   .controls-bottom {
     position: relative;
-    top: auto;
-    left: auto;
     bottom: auto;
     transform: none;
     min-width: unset;
-    max-width: unset;
     width: 100%;
-    border-radius: 0;
     max-height: none;
     overflow-y: visible;
   }
