@@ -523,7 +523,6 @@ input[type='range'] {
     flex-direction: column;
     gap: 10px;
     position: fixed;
-    bottom: 0;
     left: 0;
     right: 0;
     bottom: 10px;
