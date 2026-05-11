@@ -174,6 +174,8 @@ export const en: Record<LocaleKey, string> = {
   'fx_fallingText': 'Falling Text',
   'fx_staggeredText': 'Staggered Text',
   'fx_waveText': 'Wave Text',
+  'fx_shatterText': 'Shatter Text',
+  'fx_crayonShatter': 'Crayon Shatter',
   'fx_colorMask': 'Color Mask',
   'fx_chromaticAberration': 'Chromatic Aberration',
   'fx_glitchBars': 'Glitch Bars',

@@ -155,6 +155,10 @@ export class PixelTypewriter extends BaseEffect {
     const isTyping = this.charIndex < this.targetText.length;
     
     if (isTyping || this.config.showCursorWhenDone) {
+      // Backward-seek clamp: without it, scrubbing back leaves
+      // `lastCursorBlink > ctx.time`, so `ctx.time - lastCursorBlink` is
+      // negative until time catches up — cursor freezes mid-blink.
+      if (ctx.time < this.lastCursorBlink) this.lastCursorBlink = ctx.time;
       if (ctx.time - this.lastCursorBlink >= blinkSpeed) {
         this.showCursor = !this.showCursor;
         this.lastCursorBlink = ctx.time;

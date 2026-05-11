@@ -177,6 +177,8 @@ export const ja: Record<LocaleKey, string> = {
   'fx_fallingText': 'テキストレイン Falling',
   'fx_staggeredText': 'スタッガードテキスト Staggered',
   'fx_waveText': 'ウェーブテキスト Wave',
+  'fx_shatterText': '砕けるテキスト Shatter',
+  'fx_crayonShatter': 'クレヨン落書き Crayon',
   'fx_colorMask': 'カラーマスク Mask',
   'fx_chromaticAberration': '色収差 Chromatic',
   'fx_glitchBars': 'グリッチバー Glitch',

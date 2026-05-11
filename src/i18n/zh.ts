@@ -175,6 +175,8 @@ export const zh = {
   'fx_fallingText': '文字雨 Falling',
   'fx_staggeredText': '错落文字 Staggered',
   'fx_waveText': '波浪文字 Wave',
+  'fx_shatterText': '碎裂文字 Shatter',
+  'fx_crayonShatter': '蜡笔涂鸦 Crayon',
   'fx_colorMask': '颜色蒙版 Mask',
   'fx_chromaticAberration': '色差 Chromatic',
   'fx_glitchBars': '故障条 Glitch',

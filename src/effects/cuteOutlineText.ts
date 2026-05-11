@@ -44,16 +44,25 @@ export class CuteOutlineText extends BaseEffect {
   update(ctx: UpdateContext): void {
     const newText = ctx.currentText ?? this.config.text ?? '';
 
-    // 文字切换淡入淡出效果
-    if (newText !== this.displayedText && this.fadeState === 'idle') {
-      if (ctx.deltaTime === 0) {
+    // Pause-safe shortcut: when ctx.deltaTime === 0 (paused or seeked
+    // mid-frame) the fade state machine cannot advance — it would freeze
+    // alpha at the current value and `if (newText !== displayedText &&
+    // fadeState === 'idle')` would silently drop the new text whenever
+    // we land paused mid-fadeOut/fadeIn. Force-settle to the requested
+    // text instead so seek under pause always shows the correct lyric.
+    if (ctx.deltaTime === 0) {
+      if (newText !== this.displayedText) {
         this.textObj.text = newText;
         this.displayedText = newText;
-        this.textAlpha = 1;
-      } else {
         this.pendingText = newText;
-        this.fadeState = 'fadeOut';
       }
+      this.fadeState = 'idle';
+      this.textAlpha = 1;
+      this.textObj.alpha = 1;
+    } else if (newText !== this.displayedText && this.fadeState === 'idle') {
+      // 文字切换淡入淡出效果
+      this.pendingText = newText;
+      this.fadeState = 'fadeOut';
     }
 
     const fadeSpeed = 4 * Math.max(ctx.animationSpeed, 0.5);
