@@ -1,0 +1,62 @@
+import type { TemplateConfig } from '../core/types';
+
+export const haruhikageTemplate: TemplateConfig = {
+  name: '春日影',
+  nameKey: 'tpl_haruhikage',
+  palette: {
+    background: '#ABC5D2',
+    primary: '#5a3a5a',
+    secondary: '#7faecc',
+    accent: '#d97a7a',
+    text: '#5a3a5a',
+  },
+  bpm: 90,
+  animationSpeed: 0.8,
+  effects: [
+    {
+      type: 'backgroundBlocks',
+      layer: 'background',
+      config: { count: 7, alpha: 0.35 },
+    },
+    {
+      type: 'halftoneBlocks',
+      layer: 'background',
+      config: { color: '$primary', alpha: 0.12, size: 3, spacing: 6 },
+    },
+    {
+      type: 'scanlines',
+      layer: 'overlay',
+      config: { alpha: 0.08, spacing: 3 },
+    },
+    {
+      type: 'crayonShatter',
+      layer: 'text',
+      config: {
+        fontSize: 115,
+        fontFamily: '"Yu Gothic", "Hiragino Sans", "Helvetica Neue", Arial, sans-serif',
+        fontWeight: '700',
+        charSpacingFrac: 1.05,
+        colSpacingFrac: 1.4,
+        colRowPhase: 0.45,
+        layoutJitter: 0.06,
+        baseColor: '#5a3a5a',
+        colors: ['#d97a7a', '#e0b96a', '#83b07c', '#7faecc', '#c89bba', '#d49d6f', '#9c89c4', '#7fb6c4'],
+        replaceProb: 0.55,
+        randomReplaceMaxSizeFrac: 0.50,
+        offsetProb: 0.55,
+        maxOffsetPx: 5,
+        rotateProb: 0.55,
+        maxRotateDeg: 14,
+        swingProb: 0.15,
+        outlineProb: 1.0,
+        outlineLineWidth: 1.5,
+        outlineJitter: 0.6,
+        outlineSimplify: 6,
+        outlineSmoothIters: 2,
+        frameHoldSec: 0.18,
+        frameCount: 4,
+        spinSpeedScale: 1,
+      },
+    },
+  ],
+};

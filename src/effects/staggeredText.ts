@@ -33,7 +33,6 @@ export class StaggeredText extends BaseEffect {
   private chars: PIXI.Text[] = [];
   private currentText = '';
   private currentMode: LayoutMode = 'diag-left';
-  private modeStartTime = 0;
   private modeIndex = 0;
 
   protected setup(): void {
@@ -168,17 +167,10 @@ export class StaggeredText extends BaseEffect {
     const fontFamily = this.config.fontFamily ?? '"Noto Serif JP", "Yu Mincho", serif';
     const transitionDuration = this.config.transition ?? 0.4;
 
-    // Cycle through modes
-    const elapsed = ctx.time - this.modeStartTime;
-    if (elapsed >= modeDuration || this.modeStartTime === 0) {
-      if (this.modeStartTime !== 0) {
-        this.modeIndex = (this.modeIndex + 1) % MODES.length;
-      }
-      this.currentMode = MODES[this.modeIndex];
-      this.modeStartTime = ctx.time;
-    }
-
-    const modeElapsed = ctx.time - this.modeStartTime;
+    // Cycle through modes based on segmentTime
+    this.modeIndex = Math.floor(ctx.segmentTime / modeDuration) % MODES.length;
+    this.currentMode = MODES[this.modeIndex];
+    const modeElapsed = ctx.segmentTime % modeDuration;
     const fadeIn = Math.min(1, modeElapsed / transitionDuration);
     const fadeOut = Math.min(1, (modeDuration - modeElapsed) / transitionDuration);
     const alpha = Math.min(fadeIn, fadeOut);
@@ -227,8 +219,14 @@ export class StaggeredText extends BaseEffect {
       t.style.fontSize = s.fontSize;
       t.style.fill = color;
 
-      // Smooth lerp to target
-      const lerp = Math.min(1, 0.08 * speed * 60);
+      // Smooth lerp toward target. Pre-deltaTime-migration code computed
+      // `lerp = Math.min(1, 0.08 * speed)` per frame at 60fps; the
+      // migration accidentally inserted an extra `* 60` (probably a copy
+      // of the deltaTime conversion in some other place), turning lerp
+      // into `min(1, 4.8) = 1` → instant snap. Restore framerate-correct
+      // smoothing by scaling on `ctx.deltaTime`: at 60fps deltaTime ≈
+      // 0.0167 → lerp ≈ 0.08, matching the pre-migration "smooth" feel.
+      const lerp = Math.min(1, 0.08 * speed * 60 * ctx.deltaTime);
       t.x += (s.targetX - t.x) * lerp;
       t.y += (s.targetY - t.y) * lerp;
       t.rotation += (s.rotation - t.rotation) * lerp;

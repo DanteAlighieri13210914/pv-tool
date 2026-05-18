@@ -11,14 +11,21 @@ export abstract class BaseEffect {
   protected container!: PIXI.Container;
   protected config: Record<string, any> = {};
   protected palette!: ColorPalette;
+  protected renderer?: PIXI.Renderer;
   private _ownContainer!: PIXI.Container;
 
-  init(parentLayer: PIXI.Container, config: Record<string, any>, palette: ColorPalette): void {
+  init(
+    parentLayer: PIXI.Container,
+    config: Record<string, any>,
+    palette: ColorPalette,
+    renderer?: PIXI.Renderer,
+  ): void {
     this._ownContainer = new PIXI.Container();
     parentLayer.addChild(this._ownContainer);
     this.container = this._ownContainer;
     this.config = config;
     this.palette = palette;
+    this.renderer = renderer;
     this.setup();
   }
 

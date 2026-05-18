@@ -16,7 +16,7 @@ export class FilmGrain extends BaseEffect {
   private canvas!: HTMLCanvasElement;
   private ctx2d!: CanvasRenderingContext2D;
   private texture!: PIXI.Texture;
-  private tick = 0;
+  private lastRegen = -1;
 
   protected setup(): void {
     this.canvas = document.createElement('canvas');
@@ -56,9 +56,10 @@ export class FilmGrain extends BaseEffect {
   }
 
   update(ctx: UpdateContext): void {
-    this.tick++;
     const interval = this.config.updateInterval ?? 3;
-    if (this.tick % interval === 0) {
+    const intervalSec = interval / ctx.fps;
+    if (ctx.time - this.lastRegen >= intervalSec) {
+      this.lastRegen = ctx.time;
       this.regenerate();
     }
 

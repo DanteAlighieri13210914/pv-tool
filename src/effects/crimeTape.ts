@@ -129,21 +129,17 @@ export class CrimeTape extends BaseEffect {
   update(ctx: UpdateContext): void {
     this.initStrips(ctx.screenWidth, ctx.screenHeight);
 
-    const dt = ctx.deltaTime;
-
     for (const strip of this.strips) {
       // 更新垂直位置（跟随 screenHeight）
       strip.container.y = strip.yBase * ctx.screenHeight;
-
-      // 滚动
-      strip.scrollOffset += strip.scrollSpeed * dt * ctx.animationSpeed;
 
       // 重绘带子
       this.drawTape(strip, ctx.screenWidth);
 
       // 以单个 spacing 为周期取模，第一个文字始终在屏幕左侧一格内，保证全程无缝
       const sp = strip.spacing;
-      const phase = ((strip.scrollOffset % sp) + sp) % sp;
+      const offset = ctx.time * strip.scrollSpeed * ctx.animationSpeed + strip.scrollOffset;
+      const phase = ((offset % sp) + sp) % sp;
       for (let i = 0; i < strip.texts.length; i++) {
         strip.texts[i].x = phase - sp + i * sp;
       }

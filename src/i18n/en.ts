@@ -68,6 +68,7 @@ export const en: Record<LocaleKey, string> = {
   'yellow': 'Yellow',
   'pink': 'Pink',
   'p5red': 'P5 Red',
+  'light_blue': 'Light Blue',
 
   // Effect categories
   'cat_background': 'Background',
@@ -99,6 +100,7 @@ export const en: Record<LocaleKey, string> = {
   'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
   'tpl_kawaiPixel': 'Kawaii Pixel',
   'tpl_crimeScene': 'Crime Scene',
+  'tpl_haruhikage': 'Haruhikage',
 
   // File picker
   'choose_file': 'Choose File',
@@ -173,6 +175,9 @@ export const en: Record<LocaleKey, string> = {
   'fx_formulaText': 'Formula Text',
   'fx_fallingText': 'Falling Text',
   'fx_staggeredText': 'Staggered Text',
+  'fx_waveText': 'Wave Text',
+  'fx_shatterText': 'Shatter Text',
+  'fx_crayonShatter': 'Crayon Shatter',
   'fx_colorMask': 'Color Mask',
   'fx_chromaticAberration': 'Chromatic Aberration',
   'fx_glitchBars': 'Glitch Bars',
@@ -226,4 +231,8 @@ export const en: Record<LocaleKey, string> = {
   'url_copied': 'URL copied to clipboard',
   'listen_np_tip': '',
   'copy_url_tip': '',
+
+  // Footer
+  'footer_desc': 'Japanese PV Visual Generator',
+  'footer_contributors': 'Contributors',
 };

@@ -18,7 +18,6 @@ export class PixelTypewriter extends BaseEffect {
   private currentText: string = '';
   private targetText: string = '';
   private charIndex: number = 0;
-  private lastCharTime: number = 0;
   private showCursor: boolean = true;
   private lastCursorBlink: number = 0;
   private leftContainer!: PIXI.Container;
@@ -106,19 +105,17 @@ export class PixelTypewriter extends BaseEffect {
       this.targetText = ctx.currentText;
       this.charIndex = 0;
       this.currentText = '';
-      this.lastCharTime = ctx.time;
     }
 
-    // Add characters one by one
-    if (this.charIndex < this.targetText.length) {
-      if (ctx.time - this.lastCharTime >= charDelay) {
-        this.currentText += this.targetText[this.charIndex];
-        this.charIndex++;
-        this.lastCharTime = ctx.time;
-        
-        // Split text between left and right
-        this.updateTextSplit(maxCharsPerSide);
-      }
+    // Derive how many chars should be visible from segmentTime
+    const targetIndex = Math.min(
+      this.targetText.length,
+      Math.floor(ctx.segmentTime / charDelay),
+    );
+    if (targetIndex > this.charIndex) {
+      this.currentText = this.targetText.slice(0, targetIndex);
+      this.charIndex = targetIndex;
+      this.updateTextSplit(maxCharsPerSide);
     }
 
     // Position containers
@@ -158,6 +155,10 @@ export class PixelTypewriter extends BaseEffect {
     const isTyping = this.charIndex < this.targetText.length;
     
     if (isTyping || this.config.showCursorWhenDone) {
+      // Backward-seek clamp: without it, scrubbing back leaves
+      // `lastCursorBlink > ctx.time`, so `ctx.time - lastCursorBlink` is
+      // negative until time catches up — cursor freezes mid-blink.
+      if (ctx.time < this.lastCursorBlink) this.lastCursorBlink = ctx.time;
       if (ctx.time - this.lastCursorBlink >= blinkSpeed) {
         this.showCursor = !this.showCursor;
         this.lastCursorBlink = ctx.time;

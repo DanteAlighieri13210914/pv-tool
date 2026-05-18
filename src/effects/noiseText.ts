@@ -12,10 +12,16 @@ interface TextBlock {
   lines: string[];
   fontSize: number;
   alpha: number;
-  lifetime: number;
-  age: number;
+  lifetime: number;  // seconds
+  born: number;      // ctx.time at spawn
   hasBackground: boolean;
   inverted: boolean;
+  /** Last triggered corruption "step" (Math.floor(age / 0.083)). Used so
+   *  corruption fires once per step (rising edge) instead of every frame
+   *  the floor stays at a multiple-of-5 — the deltaTime migration's
+   *  `Math.floor(age / 0.083) % 5 === 0` check is a 5-frame "burst" gate
+   *  at 60fps because each floor unit covers 5 frames. -1 = never fired. */
+  lastCorruptStep: number;
 }
 
 const GARBLED_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?<>/\\|[]{}=+-_.:;';
@@ -36,8 +42,6 @@ export class NoiseText extends BaseEffect {
   override readonly heavy = true;
   private g!: PIXI.Graphics;
   private blocks: TextBlock[] = [];
-  private tick = 0;
-
   protected setup(): void {
     this.g = new PIXI.Graphics();
     this.container.addChild(this.g);
@@ -51,7 +55,7 @@ export class NoiseText extends BaseEffect {
     return s;
   }
 
-  private spawnBlock(w: number, h: number): TextBlock {
+  private spawnBlock(w: number, h: number, time: number): TextBlock {
     const lineCount = 1 + Math.floor(Math.random() * 5);
     const lines: string[] = [];
     const useSystem = Math.random() < 0.35;
@@ -71,15 +75,15 @@ export class NoiseText extends BaseEffect {
       lines,
       fontSize: 10 + Math.floor(Math.random() * 14),
       alpha: 0.5 + Math.random() * 0.5,
-      lifetime: 30 + Math.floor(Math.random() * 120),
-      age: 0,
+      lifetime: 0.5 + Math.random() * 2,
+      born: time,
       hasBackground: Math.random() < 0.6,
       inverted: Math.random() < 0.3,
+      lastCorruptStep: -1,
     };
   }
 
   update(ctx: UpdateContext): void {
-    this.tick++;
     const g = this.g;
     g.clear();
 
@@ -91,35 +95,49 @@ export class NoiseText extends BaseEffect {
 
     // Spawn new blocks to maintain count
     while (this.blocks.length < count) {
-      this.blocks.push(this.spawnBlock(w, h));
+      this.blocks.push(this.spawnBlock(w, h, ctx.time));
     }
 
     // Update and render
     for (let i = this.blocks.length - 1; i >= 0; i--) {
       const block = this.blocks[i];
-      block.age++;
+      const age = ctx.time - block.born;  // seconds
 
-      if (block.age > block.lifetime) {
-        this.blocks[i] = this.spawnBlock(w, h);
+      if (age > block.lifetime || age < 0) {
+        this.blocks[i] = this.spawnBlock(w, h, ctx.time);
         continue;
       }
 
       // Flicker: occasionally skip rendering
-      if (Math.random() < 0.08) continue;
+      if (ctx.deltaTime > 0 && Math.random() < 0.08) continue;
 
-      // Occasionally corrupt a character
-      if (this.tick % 5 === 0 && Math.random() < 0.3) {
-        const lineIdx = Math.floor(Math.random() * block.lines.length);
-        const line = block.lines[lineIdx];
-        const charIdx = Math.floor(Math.random() * line.length);
-        block.lines[lineIdx] =
-          line.substring(0, charIdx) +
-          GARBLED_CHARS[Math.floor(Math.random() * GARBLED_CHARS.length)] +
-          line.substring(charIdx + 1);
+      // Occasionally corrupt a character. Trigger on the RISING EDGE of
+      // each ~0.083s step (one chance per step, NOT per frame within a
+      // step). The old `tick % 5 === 0` worked at 60fps because tick
+      // monotonically increased and only one frame per 5 satisfied the
+      // gate; under deltaTime, `step = floor(age/0.083)` IS the per-step
+      // index, so we must promote the rising-edge guard with
+      // `lastCorruptStep` BEFORE the random roll — otherwise unsuccessful
+      // rolls within the same step keep retrying every frame (5 retries ×
+      // p=0.3 ≈ 83 % chance per step → ~10/sec instead of ~3.6/sec).
+      // Setting lastCorruptStep unconditionally on each step transition
+      // restores the old 12 steps/sec × 0.3 ≈ 3.6 corruptions/sec rate.
+      const step = Math.floor(age / 0.083);
+      if (step !== block.lastCorruptStep) {
+        block.lastCorruptStep = step;
+        if (Math.random() < 0.3) {
+          const lineIdx = Math.floor(Math.random() * block.lines.length);
+          const line = block.lines[lineIdx];
+          const charIdx = Math.floor(Math.random() * line.length);
+          block.lines[lineIdx] =
+            line.substring(0, charIdx) +
+            GARBLED_CHARS[Math.floor(Math.random() * GARBLED_CHARS.length)] +
+            line.substring(charIdx + 1);
+        }
       }
 
-      const fadeIn = Math.min(1, block.age / 5);
-      const fadeOut = Math.min(1, (block.lifetime - block.age) / 8);
+      const fadeIn = Math.min(1, age / 0.083);
+      const fadeOut = Math.min(1, (block.lifetime - age) / 0.133);
       const a = block.alpha * fadeIn * fadeOut;
 
       const textCol = block.inverted ? bgColor : color;

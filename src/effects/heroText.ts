@@ -43,7 +43,19 @@ export class HeroText extends BaseEffect {
   update(ctx: UpdateContext): void {
     const newText = ctx.currentText ?? this.config.text ?? '';
 
-    if (newText !== this.displayedText && this.fadeState === 'idle') {
+    // Pause-safe shortcut (see cuteOutlineText for full rationale): when
+    // ctx.deltaTime === 0, force-settle to the requested text so seek
+    // under pause never silently drops a lyric mid-fade.
+    if (ctx.deltaTime === 0) {
+      if (newText !== this.displayedText) {
+        this.textObj.text = newText;
+        this.displayedText = newText;
+        this.pendingText = newText;
+      }
+      this.fadeState = 'idle';
+      this.textAlpha = 1;
+      this.textObj.alpha = 1;
+    } else if (newText !== this.displayedText && this.fadeState === 'idle') {
       this.pendingText = newText;
       this.fadeState = 'fadeOut';
     }

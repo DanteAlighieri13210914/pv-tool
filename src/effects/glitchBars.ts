@@ -14,6 +14,7 @@ interface GlitchBar {
   speed: number;
   lifetime: number;
   born: number;
+  startX: number;
 }
 
 export class GlitchBars extends BaseEffect {
@@ -32,7 +33,11 @@ export class GlitchBars extends BaseEffect {
     const maxHeight = this.config.maxHeight ?? 12;
     const speed = ctx.animationSpeed;
 
-    // Spawn new bars
+    // Spawn new bars. The `ctx.time < lastSpawn` clamp protects against
+    // backward seek (timeline scrubbing) — without it, after seeking back
+    // the gate `time - lastSpawn > interval` stays false until time
+    // catches up to the historical lastSpawn, freezing spawning.
+    if (ctx.time < this.lastSpawn) this.lastSpawn = ctx.time;
     if (ctx.time - this.lastSpawn > spawnRate / speed && this.bars.length < maxBars) {
       this.lastSpawn = ctx.time;
       const g = new PIXI.Graphics();
@@ -55,25 +60,31 @@ export class GlitchBars extends BaseEffect {
         speed: (Math.random() - 0.5) * 200 * ctx.motionIntensity,
         lifetime: 0.08 + Math.random() * 0.2,
         born: ctx.time,
+        startX: x,
       });
     }
 
-    // Update and remove expired bars
+    // Update and remove expired bars. `age < 0` covers backward seek:
+    // existing bars whose `born > ctx.time` would otherwise survive
+    // (lifetime check fails) and render at startX + speed*age (negative
+    // offset) with alpha clamped to 1 → ghost bar at wrong position.
     this.bars = this.bars.filter(bar => {
       const age = ctx.time - bar.born;
-      if (age > bar.lifetime) {
+      if (age < 0 || age > bar.lifetime) {
         this.container.removeChild(bar.graphics);
         bar.graphics.destroy();
         return false;
       }
-      bar.graphics.x += bar.speed * ctx.deltaTime;
+      bar.graphics.x = bar.startX + bar.speed * age;
       bar.graphics.alpha = 1 - (age / bar.lifetime);
       return true;
     });
   }
 
   destroy(): void {
-    this.bars.forEach(b => b.graphics.destroy());
+    for (const b of this.bars) {
+      try { b.graphics.destroy(); } catch { /* already destroyed */ }
+    }
     this.bars = [];
     super.destroy();
   }

@@ -83,6 +83,7 @@ app.innerHTML = `
           <button class="swatch" data-color="#EEDD11" title="${t('yellow')}" style="background:#EEDD11"></button>
           <button class="swatch" data-color="#f5c6d0" title="${t('pink')}" style="background:#f5c6d0"></button>
           <button class="swatch" data-color="#ED1C24" title="${t('p5red')}" style="background:#ED1C24"></button>
+          <button class="swatch" data-color="#ABC5D2" title="${t('light_blue')}" style="background:#ABC5D2"></button>
         </div>
       </div>
 
@@ -155,7 +156,10 @@ app.innerHTML = `
       </div>
 
       <div class="control-group">
-        <label>${t('timer_label')} <span id="playback-time">00:00 / 00:00</span></label>
+        <div class="timeline-header">
+          <label>${t('timer_label')} <span id="playback-time">00:00 / 00:00</span></label>
+          <button class="btn btn-sm" id="timeline-pause-btn">⏸</button>
+        </div>
         <input type="range" id="seek-slider" min="0" max="1" step="0.001" value="0">
       </div>
 
@@ -314,6 +318,14 @@ app.innerHTML = `
 
   <button class="mobile-toggle" id="mobile-toggle" title="☰">☰</button>
   <div id="pv-container"></div>
+
+  <footer class="pv-footer" id="pv-footer">
+    <span class="pv-footer-desc">${t('footer_desc')}</span>
+    <span class="pv-footer-sep">·</span>
+    <a href="https://github.com/DanteAlighieri13210914/pv-tool" target="_blank" rel="noopener" class="pv-footer-link">GitHub</a>
+    <span class="pv-footer-sep">·</span>
+    <a href="${import.meta.env.BASE_URL}contributors.html" target="_blank" class="pv-footer-link">${t('footer_contributors')}</a>
+  </footer>
 `;
 
 const engine = new PVEngine();
@@ -782,6 +794,17 @@ function updatePlaybackTimer(): void {
 }
 
 requestAnimationFrame(updatePlaybackTimer);
+
+const timelinePauseBtn = document.getElementById('timeline-pause-btn')!;
+timelinePauseBtn.addEventListener('click', () => {
+  if (engine.paused) {
+    engine.resume();
+    timelinePauseBtn.textContent = '⏸';
+  } else {
+    engine.pause();
+    timelinePauseBtn.textContent = '▶';
+  }
+});
 
 // Segment duration
 const segSlider = document.getElementById('seg-slider') as HTMLInputElement;

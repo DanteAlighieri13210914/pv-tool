@@ -66,6 +66,7 @@ export const zh = {
   'yellow': '黄',
   'pink': '粉',
   'p5red': 'P5红',
+  'light_blue': '浅蓝',
 
   // Effect categories
   'cat_background': '背景',
@@ -97,6 +98,7 @@ export const zh = {
   'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
   'tpl_kawaiPixel': 'Kawaii像素',
   'tpl_crimeScene': '案发现场',
+  'tpl_haruhikage': '春日影',
 
   // File picker
   'choose_file': '选择文件',
@@ -174,6 +176,9 @@ export const zh = {
   'fx_formulaText': '公式文字 Formula',
   'fx_fallingText': '文字雨 Falling',
   'fx_staggeredText': '错落文字 Staggered',
+  'fx_waveText': '波浪文字 Wave',
+  'fx_shatterText': '碎裂文字 Shatter',
+  'fx_crayonShatter': '蜡笔涂鸦 Crayon',
   'fx_colorMask': '颜色蒙版 Mask',
   'fx_chromaticAberration': '色差 Chromatic',
   'fx_glitchBars': '故障条 Glitch',
@@ -225,6 +230,10 @@ export const zh = {
   'url_copied': 'URL 已复制到剪贴板',
   'listen_np_tip': '需要运行 Now Playing 服务，自动获取音乐软件正在播放的歌曲并同步显示歌词',
   'copy_url_tip': '生成可直接粘贴到 OBS 浏览器源的 URL，自动隐藏面板 / 透明背景 / 加载指定模板',
+
+  // Footer
+  'footer_desc': '日式PV Visual生成',
+  'footer_contributors': '贡献者',
 } as const;
 
 export type LocaleKey = keyof typeof zh;

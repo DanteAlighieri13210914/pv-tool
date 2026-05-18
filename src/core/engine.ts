@@ -108,6 +108,7 @@ export class PVEngine {
       preserveDrawingBuffer: true,
     });
     parent.appendChild(this.app.canvas);
+    this.app.ticker.maxFPS = 60;
 
     // Media layer at the very bottom
     const mediaLayer = new PIXI.Container();
@@ -151,7 +152,12 @@ export class PVEngine {
         }
       }
 
-      this.update(this._time, ticker.deltaTime / 60);
+      // ticker.deltaTime is normalised to "1 = 1 frame at maxFPS"; divide
+      // by maxFPS to convert to real seconds. Reading maxFPS dynamically
+      // (instead of hardcoding 60) keeps the conversion correct if the
+      // ticker target is ever retuned.
+      const targetFps = this.app.ticker.maxFPS || 60;
+      this.update(this._time, this._paused ? 0 : ticker.deltaTime / targetFps);
     });
   }
 
@@ -223,7 +229,7 @@ export class PVEngine {
         }
 
         try {
-          const effect = createEffect(entry.type, layer, config, this.palette);
+          const effect = createEffect(entry.type, layer, config, this.palette, this.app.renderer);
           this.activeEffects.push(effect);
         } catch (err) {
           console.warn(`[PVEngine] Failed to create effect "${entry.type}":`, err);
@@ -318,6 +324,34 @@ export class PVEngine {
     return this.lyricOffsetSeconds;
   }
 
+  /** Side-effect-only step: advance lyricCursor to whichever line is
+   *  active at `time`. Must be called once per frame BEFORE the read
+   *  functions getDisplayText / getSegmentTime, but the call site is
+   *  explicit (not implicit through getDisplayText) — so the two reads
+   *  can sit in any order in the ctx literal without an order-of-eval
+   *  footgun for future maintainers. */
+  private advanceLyric(time: number): void {
+    if (this._srtTimeline) return;
+    if (!this.lyricTimeline || this.lyricTimeline.length === 0) return;
+    const t = Math.max(0, time + this.lyricOffsetSeconds);
+    if (t < this.lastLyricTime) {
+      this.lyricCursor = 0;
+    }
+    this.lastLyricTime = t;
+    while (
+      this.lyricCursor + 1 < this.lyricTimeline.length
+      && this.lyricTimeline[this.lyricCursor + 1].time <= t
+    ) {
+      this.lyricCursor++;
+    }
+    while (
+      this.lyricCursor > 0
+      && this.lyricTimeline[this.lyricCursor].time > t
+    ) {
+      this.lyricCursor--;
+    }
+  }
+
   private getDisplayText(time: number): string {
     if (this._srtTimeline) {
       const ms = time * 1000;
@@ -333,27 +367,25 @@ export class PVEngine {
     }
 
     const t = Math.max(0, time + this.lyricOffsetSeconds);
-    if (t < this.lastLyricTime) {
-      this.lyricCursor = 0;
-    }
-    this.lastLyricTime = t;
-
-    while (
-      this.lyricCursor + 1 < this.lyricTimeline.length
-      && this.lyricTimeline[this.lyricCursor + 1].time <= t
-    ) {
-      this.lyricCursor++;
-    }
-
-    while (
-      this.lyricCursor > 0
-      && this.lyricTimeline[this.lyricCursor].time > t
-    ) {
-      this.lyricCursor--;
-    }
-
     if (t < this.lyricTimeline[0].time) return '';
     return this.lyricTimeline[this.lyricCursor].text;
+  }
+
+  /** Seconds elapsed since the start of the current text segment / lyric
+   *  line. Pure read — depends on lyricCursor, which advanceLyric() must
+   *  have updated for the same `time` first. */
+  private getSegmentTime(time: number): number {
+    if (this._srtTimeline) {
+      const ms = time * 1000;
+      const entry = this._srtTimeline.find(e => ms >= e.startMs && ms < e.endMs);
+      return entry ? time - entry.startMs / 1000 : 0;
+    }
+    if (!this.lyricTimeline || this.lyricTimeline.length === 0) {
+      return time % this._segmentDuration;
+    }
+    const t = Math.max(0, time + this.lyricOffsetSeconds);
+    if (t < this.lyricTimeline[0].time) return 0;
+    return t - this.lyricTimeline[this.lyricCursor].time;
   }
 
   set effectOpacity(val: number) {
@@ -722,6 +754,19 @@ export class PVEngine {
 
   private syncInvertFilter(): void {
     const mediaLayer = this.layers.get('media')!;
+    // Each toggle re-allocates ColorMatrixFilter instances; destroy the
+    // previous batch first so swapping invert/threshold modes back-and-
+    // forth doesn't leak filter shaders. invertFilter is the one filter
+    // we DO reuse across calls; skip it here so that the assignment
+    // below re-attaches the same instance instead of touching a freshly
+    // destroyed one. PIXI v8 types `mediaLayer.filters` as readonly
+    // Filter[] | null | undefined, so normalise to an array first.
+    const prev: PIXI.Filter[] = mediaLayer.filters
+      ? Array.isArray(mediaLayer.filters)
+        ? [...mediaLayer.filters]
+        : [mediaLayer.filters as unknown as PIXI.Filter]
+      : [];
+    this.disposeFilters(prev.filter(f => f !== this.invertFilter));
     if (this._thresholdMediaEnabled) {
       // High-contrast B&W: desaturate → extreme contrast (threshold-like)
       const desat = new PIXI.ColorMatrixFilter();
@@ -733,7 +778,12 @@ export class PVEngine {
       bright.matrix = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
       bright.brightness(1.15, false);
       mediaLayer.filters = [desat, contrast, bright];
-      this.invertFilter = null;
+      // invertFilter is unused in threshold mode; release it so the
+      // next mode switch back to invert reallocates fresh.
+      if (this.invertFilter) {
+        try { this.invertFilter.destroy(); } catch { /* ignore */ }
+        this.invertFilter = null;
+      }
     } else if (this._invertMediaEnabled) {
       if (!this.invertFilter) {
         this.invertFilter = new PIXI.ColorMatrixFilter();
@@ -751,7 +801,10 @@ export class PVEngine {
       ];
       mediaLayer.filters = [this.invertFilter, tint];
     } else {
-      this.invertFilter = null;
+      if (this.invertFilter) {
+        try { this.invertFilter.destroy(); } catch { /* ignore */ }
+        this.invertFilter = null;
+      }
       mediaLayer.filters = [];
     }
   }
@@ -844,15 +897,21 @@ export class PVEngine {
       );
     }
 
+    // Advance lyricCursor first; getDisplayText / getSegmentTime then
+    // both read it as pure functions (call order in the ctx literal no
+    // longer matters).
+    this.advanceLyric(lyricClock);
     const ctx: UpdateContext = {
       time,
       deltaTime,
+      fps: this.app.ticker.maxFPS,
       screenWidth: this.app.screen.width,
       screenHeight: this.app.screen.height,
       palette: this.palette,
       animationSpeed: this._animationSpeed,
       motionIntensity: this._motionIntensity,
       currentText: this.getDisplayText(lyricClock),
+      segmentTime: this.getSegmentTime(lyricClock),
       beatIntensity: this.beat.getIntensity(time) * this._beatReactivity,
       motionTargets: this.motionTargets,
     };
@@ -895,7 +954,7 @@ export class PVEngine {
 
     const beatShake = this.beat.getIntensity(time) * this._beatReactivity;
     const totalShake = this._shake + beatShake * 0.15;
-    if (totalShake > 0) {
+    if (totalShake > 0 && !this._paused) {
       px += (Math.random() - 0.5) * totalShake * 30;
       py += (Math.random() - 0.5) * totalShake * 20;
     }
@@ -936,6 +995,56 @@ export class PVEngine {
   destroy() {
     this.stopNowPlaying();
     this.clearEffects();
-    this.app.destroy(true);
+    // Release media + render-side helpers explicitly. app.destroy(true,
+    // true) tears down the PIXI tree (children + textures) but cannot
+    // clean up our own subsystems (video decoder via mediaElement, motion
+    // detector worker / canvas, outline renderer texture, BeatProvider
+    // audio context, stage AND container-level filter shaders). Without
+    // this, SPA hot-reload or re-init leaks accumulate.
+    this.destroyOutline();
+    if (this.motionDetector) {
+      this.motionDetector.destroy();
+      this.motionDetector = null;
+    }
+    if (this.mediaElement instanceof HTMLVideoElement) {
+      try { this.mediaElement.pause(); } catch { /* ignore */ }
+      this.mediaElement.src = '';
+      this.mediaElement.load();
+    }
+    this.mediaElement = null;
+    // BeatProvider.dispose() = audioCtx.close + source.disconnect +
+    // analyser.disconnect + audioEl.pause + nulls — full cleanup. Plain
+    // pause() leaks the AudioContext (browsers cap concurrent contexts
+    // around 6 — SPA hot-reload would burn the budget within ~6 reloads).
+    try { this.beat.dispose(); } catch { /* ignore */ }
+    // stage-level filters explicitly destroyed because Container.destroy()
+    // only nulls the _filterEffect ref — Shader.destroy() is what clears
+    // the GL bind group. Pass nothing (default destroyPrograms=false) so
+    // PIXI's shared shader-program cache stays alive for any other live
+    // filter instances using the same program.
+    this.disposeFilters(this.app.stage.filters);
+    this.app.stage.filters = [];
+    // Same treatment for any container-level filters set via
+    // syncInvertFilter / syncOutline. Each layer may carry its own
+    // ColorMatrixFilter / FilterEffect from the media post-processing
+    // pipeline.
+    for (const layer of this.layers.values()) {
+      this.disposeFilters(layer.filters);
+      if (layer.filters) layer.filters = [];
+    }
+    // Recursive children/texture cleanup. Default `app.destroy(true)` is
+    // `app.destroy(true, false)` → stage.destroy(false) leaves the layer
+    // containers / bgFill / effectsRoot detached but still referenced
+    // from this.layers / this.bgFill — soft JS leak until the engine
+    // itself is GC'd. true,true forces deep destroy.
+    this.app.destroy(true, true);
+  }
+
+  private disposeFilters(filters: PIXI.Filter | readonly PIXI.Filter[] | null | undefined): void {
+    if (!filters) return;
+    const arr = Array.isArray(filters) ? filters : [filters];
+    for (const f of arr) {
+      try { f.destroy(); } catch { /* already destroyed */ }
+    }
   }
 }

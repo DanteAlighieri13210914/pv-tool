@@ -68,6 +68,7 @@ export const ja: Record<LocaleKey, string> = {
   'yellow': '黄',
   'pink': 'ピンク',
   'p5red': 'P5赤',
+  'light_blue': 'ライトブルー',
 
   // Effect categories
   'cat_background': '背景',
@@ -99,6 +100,7 @@ export const ja: Record<LocaleKey, string> = {
   'tpl_flyMeToTheMoon': 'Fly Me to the Moon',
   'tpl_kawaiPixel': 'Kawaiiピクセル',
   'tpl_crimeScene': '犯罪現場',
+  'tpl_haruhikage': '春日影',
 
   // File picker
   'choose_file': 'ファイル選択',
@@ -176,6 +178,9 @@ export const ja: Record<LocaleKey, string> = {
   'fx_formulaText': '数式テキスト Formula',
   'fx_fallingText': 'テキストレイン Falling',
   'fx_staggeredText': 'スタッガードテキスト Staggered',
+  'fx_waveText': 'ウェーブテキスト Wave',
+  'fx_shatterText': 'シャッターテキスト Shatter',
+  'fx_crayonShatter': 'クレヨンシャッター Crayon',
   'fx_colorMask': 'カラーマスク Mask',
   'fx_chromaticAberration': '色収差 Chromatic',
   'fx_glitchBars': 'グリッチバー Glitch',
@@ -227,4 +232,8 @@ export const ja: Record<LocaleKey, string> = {
   'url_copied': 'URLをクリップボードにコピーしました',
   'listen_np_tip': '',
   'copy_url_tip': '',
+
+  // Footer
+  'footer_desc': 'PVビジュアルジェネレーター',
+  'footer_contributors': 'コントリビューター',
 };

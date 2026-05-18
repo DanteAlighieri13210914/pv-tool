@@ -61,6 +61,8 @@ export const effectCatalog: EffectPreset[] = [
   { type: 'fallingText', label: '文字雨 Falling', category: '文字', layer: 'decoration', config: { color: '$accent', count: 30 } },
   { type: 'staggeredText', label: '错落文字 Staggered', category: '文字', layer: 'text', config: { color: '#ffffff', fontSize: 64, modeDuration: 3.5 } },
   { type: 'waveText', label: '起伏文字 Wave', category: '文字', layer: 'text', config: { color: '#ffffff', fontSize: 52, staggerY: 18, charSpreadFrac: 0.5 } },
+  { type: 'shatterText', label: '碎裂文字 Shatter', category: '文字', layer: 'text', config: { color: '#ffffff', fontSize: 160, fontFamily: '"Noto Serif JP", "Yu Mincho", "MS Mincho", serif', fontWeight: '900', mode: 'gather', gatherDuration: 0.9, scatterRadiusFrac: 0.32, scatterScaleMin: 0.45, staggerDelay: 0.06, charSpacingFrac: 1.1, alphaThreshold: 140, minAreaFrac: 0.0015, randomDelayRange: 0.35, durationVariation: 0.5 } },
+  { type: 'crayonShatter', label: '蜡笔涂鸦 Crayon', category: '文字', layer: 'text', config: { fontSize: 115, fontFamily: '"Yu Gothic", "Hiragino Sans", "Helvetica Neue", Arial, sans-serif', fontWeight: '700', charSpacingFrac: 1.05, colSpacingFrac: 1.4, colRowPhase: 0.45, layoutJitter: 0.06, baseColor: '#5a3a5a', colors: ['#d97a7a', '#e0b96a', '#83b07c', '#7faecc', '#c89bba', '#d49d6f', '#9c89c4', '#7fb6c4'], replaceProb: 0.55, randomReplaceMaxSizeFrac: 0.50, offsetProb: 0.55, maxOffsetPx: 5, rotateProb: 0.55, maxRotateDeg: 14, swingProb: 0.15, outlineProb: 1.0, outlineLineWidth: 1.5, outlineJitter: 0.6, outlineSimplify: 6, outlineSmoothIters: 2, frameHoldSec: 0.18, frameCount: 4, spinSpeedScale: 1 } },
 
   // 叠加效果 Overlay
   { type: 'colorMask', label: '颜色蒙版 Mask', category: '叠加效果', layer: 'overlay', config: { color: '$accent', alpha: 0.3 } },

@@ -19,6 +19,7 @@ import { sweetPinkTemplate } from './sweetPink';
 import { flyMeToTheMoonTemplate } from './flyMeToTheMoon';
 import { kawaiPixelTemplate } from './kawaiPixel';
 import { crimeSceneTemplate } from './crimeScene';
+import { haruhikageTemplate } from './haruhikage';
 
 export const templates: TemplateConfig[] = [
   blueBoldTemplate,          // 0  蓝色冲击
@@ -38,6 +39,7 @@ export const templates: TemplateConfig[] = [
   flyMeToTheMoonTemplate,    // 14 Fly Me to the Moon
   kawaiPixelTemplate,        // 15 Kawaii像素
   crimeSceneTemplate,        // 16 案发现场
+  haruhikageTemplate,        // 17 春日影
 ];
 
 export function getTemplate(name: string): TemplateConfig | undefined {

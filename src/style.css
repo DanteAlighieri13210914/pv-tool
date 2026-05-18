@@ -41,6 +41,7 @@ body {
   gap: 16px;
   backdrop-filter: blur(10px);
   min-width: 220px;
+  max-width: 300px;
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -343,6 +344,12 @@ input[type='range'] {
   background: rgba(255, 50, 50, 0.25);
 }
 
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .copy-url-row {
   flex-direction: row !important;
   align-items: center;
@@ -441,15 +448,15 @@ input[type='range'] {
 /* Canvas color swatches */
 .color-swatches {
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 4px;
+  flex-wrap: nowrap;
 }
 
 .swatch {
-  width: 26px;
-  height: 26px;
-  border-radius: 5px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   padding: 0;
   position: relative;
@@ -459,7 +466,7 @@ input[type='range'] {
 
 .swatch:hover {
   border-color: rgba(255, 255, 255, 0.6);
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .swatch-active {
@@ -744,3 +751,49 @@ body.pv-panels-hidden .mobile-toggle {
 .tpl-btn { padding: 4px 8px; font-size: 11px; cursor: pointer; background: #2a2a2a; color: #ccc; border: 1px solid #444; border-radius: 3px; white-space: nowrap; }
 .tpl-btn:hover { background: #3a3a3a; color: #fff; }
 .tpl-btn-active { background: #5566cc !important; border-color: #8899ff !important; color: #fff !important; }
+
+/* Footer bar */
+.pv-footer {
+  position: fixed;
+  bottom: 10px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.06em;
+  z-index: 50;
+  user-select: none;
+  pointer-events: none;
+}
+
+.pv-footer-desc {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.pv-footer-sep {
+  color: rgba(255, 255, 255, 0.12);
+}
+
+.pv-footer-link {
+  color: rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  pointer-events: all;
+  transition: color 0.18s;
+}
+
+.pv-footer-link:hover {
+  color: rgba(102, 136, 204, 0.9);
+}
+
+body.pv-panels-hidden .pv-footer {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pv-footer {
+    display: none;
+  }
+}

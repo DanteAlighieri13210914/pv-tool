@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contributors — PV Tool</title>
+  <meta name="robots" content="index, follow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080808;
+      --surface: #111;
+      --border: #1e1e1e;
+      --text: #c8c8c8;
+      --text-dim: #555;
+      --text-muted: #3a3a3a;
+      --accent: #6688cc;
+      --accent-border: rgba(102, 136, 204, 0.25);
+      --merged: #3fb950;
+      --mono: 'IBM Plex Mono', 'Courier New', monospace;
+      --sans: 'Noto Sans JP', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* Layout */
+    .page {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 60px 32px 80px;
+    }
+
+    /* Header */
+    .site-header {
+      margin-bottom: 56px;
+    }
+
+    .breadcrumb {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      margin-bottom: 28px;
+    }
+
+    .breadcrumb a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .breadcrumb a:hover { color: var(--accent); }
+
+    .breadcrumb span { margin: 0 6px; color: var(--text-muted); }
+
+    .site-title {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 500;
+      color: #e8e8e8;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+
+    .site-title .mark {
+      color: var(--accent);
+    }
+
+    .site-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+    }
+
+    .site-meta a {
+      color: var(--text-dim);
+      text-decoration: none;
+      border-bottom: 1px solid var(--text-muted);
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .site-meta a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Section heading */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Contributors list */
+    .contributors {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-bottom: 56px;
+    }
+
+    .contributor {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px 20px;
+      background: var(--surface);
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .contributor:hover {
+      border-color: var(--accent-border);
+      background: #131313;
+    }
+
+    .contributor-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .contributor-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: opacity 0.15s;
+    }
+
+    .contributor-name:hover { opacity: 0.75; }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 1px 6px;
+      border-radius: 2px;
+    }
+
+    .badge-merged {
+      color: var(--merged);
+      background: rgba(63, 185, 80, 0.1);
+      border: 1px solid rgba(63, 185, 80, 0.2);
+    }
+
+
+    .pr-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .pr-item {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    .pr-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      width: 32px;
+    }
+
+    .pr-title {
+      color: #999;
+      line-height: 1.5;
+    }
+
+    .pr-status {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      flex-shrink: 0;
+    }
+
+    .pr-status.merged { color: var(--merged); }
+
+    /* Author note */
+    .author-section {
+      margin-bottom: 56px;
+    }
+
+    .author-card {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px 20px;
+      background: var(--surface);
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .author-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: #e8e8e8;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .author-name:hover { color: var(--accent); }
+
+    .author-role {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    /* Footer */
+    .page-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-footer a {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.15s;
+    }
+
+    .page-footer a:hover { color: var(--accent); }
+
+    .page-footer-copy {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .page { padding: 40px 20px 60px; }
+      .site-title { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header class="site-header">
+    <div class="breadcrumb">
+      <a href="/">PV Tool</a>
+      <span>/</span>
+      <span>contributors</span>
+    </div>
+    <h1 class="site-title">PV Tool <span class="mark">_</span></h1>
+    <p class="site-meta">
+      <a href="https://github.com/DanteAlighieri13210914/pv-tool" target="_blank" rel="noopener">github.com/DanteAlighieri13210914/pv-tool</a>
+      &nbsp;·&nbsp; Non-Commercial License &nbsp;·&nbsp; solaris:0914
+    </p>
+  </header>
+
+  <section class="author-section">
+    <p class="section-label">Author</p>
+    <div class="author-card">
+      <a class="author-name" href="https://github.com/DanteAlighieri13210914" target="_blank" rel="noopener">DanteAlighieri13210914</a>
+      <span class="author-role">creator &amp; maintainer</span>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-label">Contributors</p>
+    <ul class="contributors">
+
+      <li class="contributor">
+        <div class="contributor-header">
+          <a class="contributor-name" href="https://github.com/myqz-wld" target="_blank" rel="noopener">myqz-wld</a>
+          <span class="badge badge-merged">merged</span>
+        </div>
+        <ul class="pr-list">
+          <li class="pr-item">
+            <span class="pr-num">#4</span>
+            <span class="pr-title">自定义模板管理与分享码导入导出</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+          <li class="pr-item">
+            <span class="pr-num">#7</span>
+            <span class="pr-title">增加星轨特效，UI增加面板滚动与折叠</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+          <li class="pr-item">
+            <span class="pr-num">#9</span>
+            <span class="pr-title">补全本地化、导出分享码改为toast提示、新增时间轴进度条</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+          <li class="pr-item">
+            <span class="pr-num">#13</span>
+            <span class="pr-title">新增案发现场模板及相关特效</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+        </ul>
+      </li>
+
+      <li class="contributor">
+        <div class="contributor-header">
+          <a class="contributor-name" href="https://github.com/loidif" target="_blank" rel="noopener">loidif</a>
+          <span class="badge badge-merged">merged</span>
+        </div>
+        <ul class="pr-list">
+          <li class="pr-item">
+            <span class="pr-num">#6</span>
+            <span class="pr-title">格子花边模板及四个新特效</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+          <li class="pr-item">
+            <span class="pr-num">#8</span>
+            <span class="pr-title">Kawaii像素模板及四个新特效</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+        </ul>
+      </li>
+
+      <li class="contributor">
+        <div class="contributor-header">
+          <a class="contributor-name" href="https://github.com/Widdit" target="_blank" rel="noopener">Widdit</a>
+          <span class="badge badge-merged">merged</span>
+        </div>
+        <ul class="pr-list">
+          <li class="pr-item">
+            <span class="pr-num">#10</span>
+            <span class="pr-title">新增 Now Playing 实时歌词同步等功能</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+        </ul>
+      </li>
+
+      <li class="contributor">
+        <div class="contributor-header">
+          <a class="contributor-name" href="https://github.com/jimieguang" target="_blank" rel="noopener">jimieguang</a>
+          <span class="badge badge-merged">merged</span>
+        </div>
+        <ul class="pr-list">
+          <li class="pr-item">
+            <span class="pr-num">#3</span>
+            <span class="pr-title">增加LRC歌词核心支持，支持上传文件及计时功能</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+        </ul>
+      </li>
+
+      <li class="contributor">
+        <div class="contributor-header">
+          <a class="contributor-name" href="https://github.com/mamayu1" target="_blank" rel="noopener">mamayu1</a>
+          <span class="badge badge-merged">merged</span>
+        </div>
+        <ul class="pr-list">
+          <li class="pr-item">
+            <span class="pr-num">#20</span>
+            <span class="pr-title">新增模板按钮网格，解决 OBS 浏览器源无法切换模板的问题</span>
+            <span class="pr-status merged">merged</span>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+  </section>
+
+  <footer class="page-footer">
+    <a href="/">← Back to PV Tool</a>
+    <a href="https://github.com/DanteAlighieri13210914/pv-tool/pulls" target="_blank" rel="noopener">All PRs on GitHub ↗</a>
+    <span class="page-footer-copy">© 2026 DanteAlighieri13210914</span>
+  </footer>
+
+</div>
+</body>
+</html>

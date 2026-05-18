@@ -80,6 +80,8 @@ import { PixelTypewriter } from './pixelTypewriter';
 import { CrimeTape } from './crimeTape';
 import { BloodSplatter } from './bloodSplatter';
 import { VictimOutline } from './victimOutline';
+import { ShatterText } from './shatterText';
+import { CrayonShatter } from './crayonShatter';
 
 type EffectConstructor = new () => BaseEffect;
 
@@ -164,17 +166,20 @@ register('pixelTypewriter', PixelTypewriter);
 register('crimeTape', CrimeTape);
 register('bloodSplatter', BloodSplatter);
 register('victimOutline', VictimOutline);
+register('shatterText', ShatterText);
+register('crayonShatter', CrayonShatter);
 
 export function createEffect(
   type: string,
   container: PIXI.Container,
   config: Record<string, any>,
-  palette: ColorPalette
+  palette: ColorPalette,
+  renderer?: PIXI.Renderer,
 ): BaseEffect {
   const Ctor = registry.get(type);
   if (!Ctor) throw new Error(`Unknown effect type: ${type}`);
   const effect = new Ctor();
-  effect.init(container, config, palette);
+  effect.init(container, config, palette, renderer);
   return effect;
 }
 

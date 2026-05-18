@@ -15,6 +15,9 @@ dist-ssr
 # Reference files (local only)
 reference/
 
+# Documentation build artifacts (local only)
+docs/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

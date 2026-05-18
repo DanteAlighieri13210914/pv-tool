@@ -12,7 +12,6 @@ export class WaveText extends BaseEffect {
   private charBaseY: number[] = [];
   private charContainer!: PIXI.Container;
   private prevText = '';
-  private textChangeTime = -10;
   private staggerY = 0;
 
   protected setup(): void {
@@ -66,11 +65,10 @@ export class WaveText extends BaseEffect {
 
     if (ctx.currentText !== this.prevText) {
       this.prevText = ctx.currentText;
-      this.textChangeTime = ctx.time;
       this.rebuildChars(ctx.currentText, cx, cy, ctx.screenWidth);
     }
 
-    const elapsed = ctx.time - this.textChangeTime;
+    const elapsed = ctx.segmentTime;
     for (let i = 0; i < this.charTexts.length; i++) {
       const delay = i * 0.15;
       const t = Math.max(0, elapsed - delay);
